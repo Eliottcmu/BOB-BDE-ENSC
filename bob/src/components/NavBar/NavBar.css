@@ -1,0 +1,38 @@
+/* Global navbar styles */
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #ebdec6;
+    border-top: solid 3px #493a04;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Navigation links container */
+.navlink {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    font-size: 0.9em;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+/* Icons in the nav links */
+.navlink-icon {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+.navlink:active {
+    color: rgba(0, 0, 0, 0.7);
+}

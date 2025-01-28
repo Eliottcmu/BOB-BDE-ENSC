@@ -1,0 +1,163 @@
+/* Variables */
+:root {
+    --primary-color: #111827;
+    --background-color: #f3f4f6;
+    --white: #ffffff;
+    --error-color: #ef4444;
+    --border-color: #e5e7eb;
+    --text-color: #374151;
+    --header-height: 4rem;
+    --blue-500: #3b82f6;
+    --gray-300: #d1d5db;
+}
+
+/* General Reset */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 1.5;
+    margin-bottom: 100px;
+
+}
+
+/* Container */
+.tresorerie-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    max-width: 1200px;
+    margin-bottom: 1000px;
+    min-height: 110vh;
+}
+
+/* Header */
+.header {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Filters */
+.filters-container {
+    background-color: var(--white);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    width: 100%;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.filter-item label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.25rem;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-secondary {
+    background-color: var(--gray-300);
+    color: var(--text-color);
+}
+
+/* Cards */
+.card {
+    background-color: var(--white);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.card-body {
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+/* Table */
+.sales-table {
+    width: 100%;
+    border-spacing: 0 0.5rem;
+    border-collapse: separate;
+    margin-bottom: 100px;
+
+}
+
+.sales-table th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.sales-table td {
+    background-color: var(--white);
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .body {
+        margin-bottom: 100px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .body {
+        margin-bottom: 100px;
+    }
+}
