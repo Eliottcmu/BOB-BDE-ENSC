@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getVentes,deleteVente, deleteAllVentes } from '../services/api';
+import { getVentes, deleteVente, deleteAllVentes } from '../services/api';
 import Loader from '../components/Loader/Loader';
 
 function formatDateTime(datetime) {
@@ -168,12 +168,14 @@ const Tresorerie = ({ setPage }) => {
         <div className="tresorerie-container">
             <header className="header" role="banner">
                 <h1>Trésorerie</h1>
+
             </header>
 
             <main className="main-content">
                 <div className="filters-container">
                     <div className="filters-grid">
                         <div className="filter-item">
+                            <p>penser à faire plusieurs pages pour eviter de faire charger trop de trucs : changer l'api</p>
                             <label>Date début</label>
                             <input
                                 type="date"
@@ -235,8 +237,8 @@ const Tresorerie = ({ setPage }) => {
                     </div>
                 </div>
                 <div className="table-actions">
-                    <button 
-                        onClick={handleResetAllVentes} 
+                    <button
+                        onClick={handleResetAllVentes}
                         className="btn btn-danger"
                     >
                         Réinitialiser toutes les ventes
@@ -263,8 +265,8 @@ const Tresorerie = ({ setPage }) => {
                                     <td data-label="Montant">{vente.montant.toFixed(2)} €</td>
                                     <td data-label="Actions">
                                         {!vente.entries && ( // Only show delete for individual entries, not grouped
-                                            <button 
-                                                onClick={() => handleDeleteVente(vente.id)} 
+                                            <button
+                                                onClick={() => handleDeleteVente(vente.id)}
                                                 className="btn btn-sm btn-danger"
                                             >
                                                 Supprimer
