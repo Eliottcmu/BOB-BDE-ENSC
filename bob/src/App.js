@@ -10,15 +10,22 @@ import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile';
 import Page404 from './pages/Page404';
 import Loader from './components/Loader/Loader';
+import Login from './pages/LoginPage';
+import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 
 const App = () => {
   const [page, setPage] = useState('Home');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000); // Simule un délai de chargement
+    const timer = setTimeout(() => setIsLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Create a wrapper component to handle setPage prop consistently
+  const PageWrapper = ({ component: Component }) => {
+    return <Component setPage={setPage} />;
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -28,13 +35,65 @@ const App = () => {
     <BrowserRouter>
       <NavBar setPage={setPage} />
       <Routes>
-        <Route path="/" element={<Home setPage={setPage} />} />
-        <Route path="/stock" element={<Stock setPage={setPage} />} />
-        <Route path="/statistiques" element={<Statistiques setPage={setPage} />} />
-        <Route path="/ventes" element={<Ventes setPage={setPage} />} />
-        <Route path="/tresorerie" element={<Tresorerie setPage={setPage} />} />
-        <Route path="/profile" element={<Profile setPage={setPage} />} />
-        <Route path="*" element={<Page404 setPage={setPage} />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Home} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/stock"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Stock} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/statistiques"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Statistiques} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ventes"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Ventes} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tresorerie"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Tresorerie} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <PageWrapper component={Profile} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={<PageWrapper component={Page404} />}
+        />
       </Routes>
     </BrowserRouter>
   );
