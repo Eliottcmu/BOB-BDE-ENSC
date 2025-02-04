@@ -295,6 +295,10 @@ const Profile = () => {
                         </div>
                         <button type="submit">Ajouter</button>
                     </form>
+                    <div> dd  </div>
+                    <div> d  </div>
+                    <div> d  </div>
+                    <div> s  </div>
                 </div>
             </div>
         </div>

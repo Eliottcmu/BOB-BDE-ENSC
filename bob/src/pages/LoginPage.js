@@ -1,100 +1,93 @@
+// pages/LoginPage.js
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../services/auth';
-import { Eye, EyeOff } from 'lucide-react';
-const LoginPage = () => {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
-    const [error, setError] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+
+const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [formData, setFormData] = useState({
+        name: '',
+        password: ''
+    });
+    const [error, setError] = useState('');
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         setError('');
+
         try {
-            const user = await loginUser(credentials);
-            if (user.isAdmin) {
-                // Redirect to the intended page or home
-                const from = location.state?.from?.pathname || '/';
-                navigate(from, { replace: true });
-            } else {
-                setError('Accès non autorisé - Administrateur uniquement');
-            }
-        } catch (err) {
-            if (err.message === 'Accès non autorisé') {
-                setError('Accès non autorisé - Administrateur uniquement');
-            } else {
-                setError('Nom d\'utilisateur ou mot de passe incorrect');
-            }
-        } finally {
-            setIsLoading(false);
+            const user = await loginUser(formData);
+            // Rediriger vers la page demandée ou la page d'accueil
+            const from = location.state?.from?.pathname || '/';
+            navigate(from, { replace: true });
+        } catch (error) {
+            setError(error.message || 'Une erreur est survenue lors de la connexion');
         }
     };
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCredentials(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        setError('');
-    };
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-                <h1 className="text-2xl font-bold text-center text-gray-900">Connexion Administrateur</h1>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <input
-                            type="text"
-                            name="username"
-                            value={credentials.username}
-                            onChange={handleChange}
-                            placeholder="Nom d'utilisateur"
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                            disabled={isLoading}
-                            autoComplete="username"
-                        />
-                    </div>
-                    <div className="relative">
-                        <input
-                            type={showPassword ? 'text' : 'password'}
-                            name="password"
-                            value={credentials.password}
-                            onChange={handleChange}
-                            placeholder="Mot de passe"
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                            disabled={isLoading}
-                            autoComplete="current-password"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
-                            disabled={isLoading}
-                            aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        >
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </button>
-                    </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        Connexion à votre compte
+                    </h2>
+                </div>
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     {error && (
-                        <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                            {error}
+                        <div className="rounded-md bg-red-50 p-4">
+                            <div className="text-sm text-red-700">{ }</div>
                         </div>
                     )}
-                    <button
-                        type="submit"
-                        className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Connexion...' : 'Se connecter'}
-                    </button>
+                    <div className="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label htmlFor="name" className="sr-only">Nom</label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="name"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Nom"
+                                value={formData.name}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="sr-only">Mot de passe</label>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                placeholder="Mot de passe"
+                                value={formData.password}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Se connecter
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     );
 };
-export default LoginPage;
+
+export default Login;
