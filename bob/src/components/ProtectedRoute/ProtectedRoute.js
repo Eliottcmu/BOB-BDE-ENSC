@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { isAuthenticated } from '../../services/auth';
 import { getIsAdmin } from '../../services/api';
+import NoAccess from '../NoAccess/noAccess'; // Import the new component
 
 export const ProtectedRoute = ({ children, requireAdmin }) => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -34,9 +35,9 @@ export const ProtectedRoute = ({ children, requireAdmin }) => {
         return <div>Chargement...</div>;
     }
 
-    // Si la route requiert un accès admin et que l'utilisateur n'est pas admin, redirigez vers /profile
+    // If route requires admin and user is not admin, show NoAccess component
     if (requireAdmin && !isAdmin) {
-        return <Navigate to="/profile" replace />;
+        return <NoAccess />;
     }
 
     return children;

@@ -20,10 +20,7 @@ export const loginUser = async (credentials) => {
         // Stockage des informations d'authentification
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            isAdmin: user.isAdmin
+            id: user.id
         }));
 
         return user;
@@ -78,6 +75,7 @@ axiosInstance.interceptors.response.use(
 export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.clear();
 };
 
 export const isAuthenticated = () => {

@@ -12,6 +12,15 @@ export const getUsers = async () => {
         throw error;
     }
 };
+export const getUser = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`${BASE_URL}/users/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'utilisateur :', error);
+        throw error;
+    }
+};
 
 export const getBeers = async () => {
     try {

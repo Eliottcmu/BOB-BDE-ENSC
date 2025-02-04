@@ -15,7 +15,7 @@ function Home({ setPage }) {
         <div className="home-container">
             <header className="header">
                 <h1>Accueil</h1>
-                <Link to="/profile" className="profile-link">
+                <Link to="/listuser" className="profile-link">
                     <FaUser />
                 </Link>
 
