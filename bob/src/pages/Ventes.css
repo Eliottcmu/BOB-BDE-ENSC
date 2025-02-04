@@ -1,5 +1,5 @@
 /* Variables CSS pour la cohérence des couleurs et des espaces */
-:root {
+/* :root {
     --primary-color: #111827;
     --background-color: #f3f4f6;
     --white: #ffffff;
@@ -10,10 +10,10 @@
     --button-disabled: #9ca3af;
     --low-stock-color: #ef4444;
     --header-height: 4rem;
-}
+} */
 
 /* Styles de base et utilitaires */
-.sr-only {
+/* .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -22,10 +22,10 @@
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     border: 0;
-}
+} */
 
 /* Container principal */
-.ventes-container {
+/* .ventes-container {
     min-height: 100vh;
     background-color: var(--background-color);
     display: flex;
@@ -60,7 +60,7 @@
     to {
         transform: rotate(360deg);
     }
-}
+} */
 
 /* Message d'erreur */
 .error-message {
@@ -74,7 +74,7 @@
 }
 
 /* Header */
-.header {
+/* .header {
     background-color: var(--white);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     position: sticky;
@@ -98,19 +98,19 @@
     .header h1 {
         font-size: 1.875rem;
     }
-}
+} */
 
 /* Contenu principal */
-.main-content {
+/* .main-content {
     flex: 1;
     max-width: 80rem;
     margin: 0 auto;
     padding: 1.5rem 1rem;
     width: 100%;
-}
+} */
 
 /* Grille des bières */
-.beer-grid {
+/* .beer-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -126,10 +126,10 @@
     .beer-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-}
+} */
 
 /* Carte de bière */
-.beer-card {
+/* .beer-card {
     background-color: var(--white);
     border-radius: 0.5rem;
     padding: 1.5rem;
@@ -155,10 +155,10 @@
 .low-stock {
     color: var(--low-stock-color);
     font-weight: 600;
-}
+} */
 
 /* Bouton de vente */
-.sell-button {
+/* .sell-button {
     width: 100%;
     margin-top: 1rem;
     padding: 0.75rem 1rem;
@@ -174,18 +174,18 @@
 .sell-button.disabled {
     background-color: var(--button-disabled);
     cursor: not-allowed;
-}
+} */
 
 /* Footer */
-.footer {
+/* .footer {
     background-color: var(--white);
     padding: 1rem;
     text-align: center;
     margin-top: auto;
-}
+} */
 
 /* Styles d'impression */
-@media print {
+/* @media print {
     .ventes-container {
         background: var(--white);
     }
@@ -203,4 +203,4 @@
     .sell-button {
         display: none;
     }
-}
+} */

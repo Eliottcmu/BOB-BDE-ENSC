@@ -11,7 +11,7 @@ const validatePassword = (password) => {
     return password.length > 3;
 };
 
-const Profile = () => {
+const ListUser = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
@@ -301,4 +301,4 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+export default ListUser;

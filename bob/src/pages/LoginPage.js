@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../services/auth';
 import { Eye, EyeOff } from 'lucide-react';
-
 const LoginPage = () => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
@@ -10,12 +9,10 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
-
         try {
             const user = await loginUser(credentials);
             if (user.isAdmin) {
@@ -35,7 +32,6 @@ const LoginPage = () => {
             setIsLoading(false);
         }
     };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCredentials(prev => ({
@@ -44,7 +40,6 @@ const LoginPage = () => {
         }));
         setError('');
     };
-
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
@@ -102,5 +97,4 @@ const LoginPage = () => {
         </div>
     );
 };
-
 export default LoginPage;

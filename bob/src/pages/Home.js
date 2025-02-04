@@ -6,10 +6,14 @@ import { FaUser } from 'react-icons/fa';
 
 function Home({ setPage }) {
     const navigate = useNavigate();
+
+    const handleLogout = () => {
+        navigate('/login');
+    };
+
     return (
         <div className="home-container">
             <header className="header">
-
                 <h1>Accueil</h1>
                 <Link to="/profile" className="profile-link">
                     <FaUser />
@@ -18,7 +22,7 @@ function Home({ setPage }) {
             </header>
 
             <main>
-
+                <button className="logout-button" onClick={handleLogout}>Déconnexion</button>
                 <div className="sections-container">
                     <button
                         className="section-button"
@@ -46,10 +50,11 @@ function Home({ setPage }) {
                         onClick={() => navigate('/ventes')}
                     >
                         <div className="section-image ventes"></div>
-                        <span>VENTES</span></button>
+                        <span>VENTES</span>
+                    </button>
                 </div>
-
-            </main><img src="BOB.png" id="bob" alt="BOB" />
+            </main>
+            <img src="BOB.png" id="bob" alt="BOB" />
             <footer>All Rights Reserved - BDE ENSC ©</footer>
         </div>
     );
