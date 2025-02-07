@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { getBeers, putBeer, postVentes } from '../services/api';
+import { getProducts, putProduct, postVentes } from '../services/api';
 import Loader from '../components/Loader/Loader';
 import './Ventes.css';
 
 const Ventes = ({ setPage }) => {
-    const [beers, setBeers] = useState([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         setPage('Ventes');
-        loadBeers();
+        loadProducts();
     }, [setPage]);
 
-    const loadBeers = async () => {
+    const loadProducts = async () => {
         try {
-            const data = await getBeers();
-            setBeers(data);
+            const data = await getProducts();
+            setProducts(data);
             setLoading(false);
         } catch (err) {
             setError('Erreur lors du chargement des bières');
@@ -24,30 +24,30 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    const handleSell = async (beer) => {
-        if (beer.quantity <= 0) {
+    const handleSell = async (product) => {
+        if (product.quantity <= 0) {
             alert('Plus de stock disponible pour cette bière !');
             return;
         }
 
         try {
-            const updatedBeer = {
-                ...beer,
-                quantity: beer.quantity - 1
+            const updatedProduct = {
+                ...product,
+                quantity: product.quantity - 1
             };
 
-            await putBeer(beer.id, updatedBeer);
+            await putProduct(product.id, updatedProduct);
 
             const vente = {
                 date: new Date(),
-                idProduit: beer.id,
+                idProduit: product.id,
                 quantite: 1,
-                montant: beer.price,
-                name: beer.name,
+                montant: product.price,
+                name: product.name,
             };
 
             await postVentes(vente);
-            loadBeers();
+            loadProducts();
         } catch (err) {
             setError('Erreur lors de la vente');
         }
@@ -74,34 +74,34 @@ const Ventes = ({ setPage }) => {
             </header>
 
             <main className="main-content" role="main">
-                <div className="beer-grid">
-                    {beers.map((beer) => (
+                <div className="product-grid">
+                    {products.map((product) => (
                         <div
-                            key={beer.id}
-                            className="beer-card"
+                            key={product.id}
+                            className="product-card"
                             tabIndex="0"
                             role="article"
-                            aria-label={`${beer.name} - Prix: ${beer.price}€ - Stock: ${beer.quantity}`}
+                            aria-label={`${product.name} - Prix: ${product.price}€ - Stock: ${product.quantity}`}
                         >
-                            <h2>{beer.name}</h2>
-                            <div className="beer-info">
-                                <p>Prix: {beer.price.toFixed(2)} €</p>
+                            <h2>{product.name}</h2>
+                            <div className="product-info">
+                                <p>Prix: {product.price.toFixed(2)} €</p>
                                 <p>
-                                    Stock: <span className={beer.quantity <= 5 ? 'low-stock' : ''}>
-                                        {beer.quantity}
+                                    Stock: <span className={product.quantity <= 5 ? 'low-stock' : ''}>
+                                        {product.quantity}
                                     </span>
-                                    {beer.quantity <= 5 && (
+                                    {product.quantity <= 5 && (
                                         <span className="sr-only"> - Stock faible</span>
                                     )}
                                 </p>
                             </div>
                             <button
-                                onClick={() => handleSell(beer)}
-                                disabled={beer.quantity <= 0}
-                                className={`sell-button ${beer.quantity <= 0 ? 'disabled' : ''}`}
-                                aria-disabled={beer.quantity <= 0}
+                                onClick={() => handleSell(product)}
+                                disabled={product.quantity <= 0}
+                                className={`sell-button ${product.quantity <= 0 ? 'disabled' : ''}`}
+                                aria-disabled={product.quantity <= 0}
                             >
-                                {beer.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
+                                {product.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
                             </button>
                         </div>
                     ))}

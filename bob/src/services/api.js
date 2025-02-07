@@ -3,6 +3,28 @@ import axiosInstance from './auth';
 
 const BASE_URL = 'http://localhost:5000/api';
 
+axiosInstance.interceptors.request.use(config => {
+    console.log('Request Config:', {
+        method: config.method,
+        url: config.url,
+        data: config.data
+    });
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
+axiosInstance.interceptors.response.use(
+    response => response,
+    error => {
+        console.error('Full Error Response:', {
+            status: error.response?.status,
+            data: error.response?.data,
+            headers: error.response?.headers
+        });
+        return Promise.reject(error);
+    }
+);
+
 export const getUsers = async () => {
     try {
         const response = await axiosInstance.get('/users');
@@ -22,26 +44,35 @@ export const getUser = async (userId) => {
     }
 };
 
-export const getBeers = async () => {
+export const getProducts = async () => {
     try {
         const response = await axiosInstance.get('/stock');
         return response.data;
     } catch (error) {
-        console.error('Erreur lors de la récupération des bières :', error);
+        console.error('Error fetching products:', error);
         throw error;
     }
 };
 
-export const postBeer = async (beer) => {
+export const postProduct = async (product) => {
     try {
-        const response = await axiosInstance.post('/stock', beer);
+        // Ensure all required fields are present
+        const validatedProduct = {
+            name: product.name,
+            price: Number(product.price),
+            quantity: Number(product.quantity),
+            type: product.type
+        };
+
+        console.log('Sending Product:', validatedProduct);
+
+        const response = await axiosInstance.post('/stock', validatedProduct);
         return response.data;
     } catch (error) {
-        console.error('Erreur lors de la création de la bière :', error);
+        console.error('Error creating product:', error.response?.data || error.message);
         throw error;
     }
 };
-
 
 export const postUser = async (user) => {
     try {
@@ -73,25 +104,25 @@ export const deleteUser = async (userId) => {
     }
 }
 
-export const putBeer = async (beerId, updatedBeer) => {
+export const putProduct = async (productId, updatedProduct) => {
     try {
-        const response = await axiosInstance.put(`${BASE_URL}/stock/${beerId}`, updatedBeer);
+        const response = await axiosInstance.put(`/stock/${productId}`, updatedProduct);
         return response.data;
     } catch (error) {
-        console.error('Erreur lors de la modification de la bière :', error);
+        console.error('Error updating product:', error);
         throw error;
     }
-}
+};
 
-export const deleteBeer = async (beerId) => {
+export const deleteProduct = async (productId) => {
     try {
-        const response = await axiosInstance.delete(`${BASE_URL}/stock/${beerId}`);
+        const response = await axiosInstance.delete(`/stock/${productId}`);
         return response.data;
     } catch (error) {
-        console.error('Erreur lors de la suppression de la bière :', error);
+        console.error('Error deleting product:', error);
         throw error;
     }
-}
+};
 
 // Récupérer toutes les ventes
 export const getVentes = async () => {
@@ -185,3 +216,6 @@ export const getIsAdmin = async () => {
         throw error;
     }
 };
+
+
+export default axiosInstance;

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { getVentes, getBeers } from '../services/api';
+import { getVentes, getProducts } from '../services/api';
 import Loader from '../components/Loader/Loader';
 import './Statistiques.css';
 
 const Statistiques = ({ setPage }) => {
     const [loading, setLoading] = useState(true);
     const [ventesData, setVentesData] = useState([]);
-    const [beersData, setBeersData] = useState([]);
+    const [productsData, setProductsData] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState('all');
     const [statsVentes, setStatsVentes] = useState({
         totalVentes: 0,
@@ -23,9 +23,9 @@ const Statistiques = ({ setPage }) => {
 
     const fetchData = async () => {
         try {
-            const [ventes, beers] = await Promise.all([getVentes(), getBeers()]);
+            const [ventes, products] = await Promise.all([getVentes(), getProducts()]);
             setVentesData(ventes);
-            setBeersData(beers);
+            setProductsData(products);
             calculateStats(ventes);
             setLoading(false);
         } catch (error) {
@@ -149,8 +149,8 @@ const Statistiques = ({ setPage }) => {
                         onChange={(e) => setSelectedProduct(e.target.value)}
                     >
                         <option value="all">Tous les produits</option>
-                        {beersData.map(beer => (
-                            <option key={beer.id} value={beer.name}>{beer.name}</option>
+                        {productsData.map(product => (
+                            <option key={product.id} value={product.name}>{product.name}</option>
                         ))}
                     </select>
                 </div>
