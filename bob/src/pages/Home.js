@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Home.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
+import { getIsAdmin } from '../services/api'
 
 function Home({ setPage }) {
     const navigate = useNavigate();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            try {
+                const adminStatus = await getIsAdmin();
+                setIsAdmin(adminStatus);
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+            }
+        };
+
+        checkAdminStatus();
+    }, []);
+
 
     const handleLogout = () => {
         navigate('/login');
@@ -15,7 +31,11 @@ function Home({ setPage }) {
         <div className="home-container">
             <header className="header">
                 <h1>Accueil</h1>
-                <Link to="/listuser" className="profile-link">
+
+                <Link
+                    to={isAdmin ? '/listuser' : '/profile'}
+                    className="profile-link"
+                >
                     <FaUser />
                 </Link>
 
@@ -56,7 +76,7 @@ function Home({ setPage }) {
             </main>
             <img src="BOB.png" id="bob" alt="BOB" />
             <footer>All Rights Reserved - BDE ENSC ©</footer>
-        </div>
+        </div >
     );
 }
 

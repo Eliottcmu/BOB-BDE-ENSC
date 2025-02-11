@@ -3,16 +3,18 @@ import axiosInstance from './auth';
 
 const BASE_URL = 'http://localhost:5000/api';
 
-axiosInstance.interceptors.request.use(config => {
-    console.log('Request Config:', {
-        method: config.method,
-        url: config.url,
-        data: config.data
-    });
-    return config;
-}, error => {
-    return Promise.reject(error);
-});
+
+//si besoin de test : 
+// axiosInstance.interceptors.request.use(config => {
+//     console.log('Request Config:', {
+//         method: config.method,
+//         url: config.url,
+//         data: config.data
+//     });
+//     return config;
+// }, error => {
+//     return Promise.reject(error);
+// });
 axiosInstance.interceptors.response.use(
     response => response,
     error => {

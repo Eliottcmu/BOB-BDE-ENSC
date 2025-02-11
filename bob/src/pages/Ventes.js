@@ -7,6 +7,9 @@ const Ventes = ({ setPage }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedType, setSelectedType] = useState(null);
+
+    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
 
     useEffect(() => {
         setPage('Ventes');
@@ -16,26 +19,22 @@ const Ventes = ({ setPage }) => {
     const loadProducts = async () => {
         try {
             const data = await getProducts();
-            setProducts(data);
+            setProducts(Array.isArray(data) ? data : []);
             setLoading(false);
         } catch (err) {
-            setError('Erreur lors du chargement des bières');
+            setError('Erreur lors du chargement des produits');
             setLoading(false);
         }
     };
 
     const handleSell = async (product) => {
         if (product.quantity <= 0) {
-            alert('Plus de stock disponible pour cette bière !');
+            alert('Plus de stock disponible pour ce produit !');
             return;
         }
 
         try {
-            const updatedProduct = {
-                ...product,
-                quantity: product.quantity - 1
-            };
-
+            const updatedProduct = { ...product, quantity: product.quantity - 1 };
             await putProduct(product.id, updatedProduct);
 
             const vente = {
@@ -53,67 +52,56 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    if (loading) {
-        return <Loader message="Chargement des bières..." />;
-    }
-
-    if (error) {
-        return (
-            <div className="error-message" role="alert">
-                {error}
-            </div>
-        );
-    }
+    if (loading) return <Loader message="Chargement des produits..." />;
+    if (error) return <div className="error-message">{error}</div>;
 
     return (
         <div className="ventes-container">
-            <header className="header" role="banner">
-                <div className="header-content">
-                    <h1 tabIndex="0">Ventes</h1>
+            <header className="header">
+                <h1>Ventes</h1>
+                <div className="filter-buttons">
+                    {productTypes.map((type) => (
+                        <button
+                            key={type}
+                            onClick={() => setSelectedType(type)}
+                            className={selectedType === type ? 'active' : ''}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                    <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
             </header>
 
-            <main className="main-content" role="main">
-                <div className="product-grid">
-                    {products.map((product) => (
-                        <div
-                            key={product.id}
-                            className="product-card"
-                            tabIndex="0"
-                            role="article"
-                            aria-label={`${product.name} - Prix: ${product.price}€ - Stock: ${product.quantity}`}
-                        >
-                            <h2>{product.name}</h2>
-                            <div className="product-info">
-                                <p>Prix: {product.price.toFixed(2)} €</p>
-                                <p>
-                                    Stock: <span className={product.quantity <= 5 ? 'low-stock' : ''}>
-                                        {product.quantity}
-                                    </span>
-                                    {product.quantity <= 5 && (
-                                        <span className="sr-only"> - Stock faible</span>
-                                    )}
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => handleSell(product)}
-                                disabled={product.quantity <= 0}
-                                className={`sell-button ${product.quantity <= 0 ? 'disabled' : ''}`}
-                                aria-disabled={product.quantity <= 0}
-                            >
-                                {product.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </main>
+            <main>
+                {productTypes.map((type) => {
+                    if (selectedType && selectedType !== type) return null;
+                    const filteredProducts = products.filter((product) => product.type === type);
+                    if (filteredProducts.length === 0) return null;
 
-            <footer className="footer" role="contentinfo">
-                <p>
-                    All Rights Reserved - BDE ENSC ©
-                    <span className="sr-only">Bureau des étudiants ENSC</span>
-                </p>
-            </footer>
+                    return (
+                        <div key={type} className={`product-group ${type.toLowerCase()}`}>
+                            <h2>{type}</h2>
+                            <div className="products-grid">
+                                {filteredProducts.map((product) => (
+                                    <div key={product.id} className="product-card">
+                                        <h3>{product.name}</h3>
+                                        <p>Prix : {product.price.toFixed(2)} €</p>
+                                        <p>Quantité : {product.quantity}</p>
+                                        <button
+                                            onClick={() => handleSell(product)}
+                                            disabled={product.quantity <= 0}
+                                            className="sell-button"
+                                        >
+                                            {product.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
+            </main>
         </div>
     );
 };

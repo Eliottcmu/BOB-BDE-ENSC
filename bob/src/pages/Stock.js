@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { getProducts, postProduct, putProduct, deleteProduct } from '../services/api';
 import Loader from '../components/Loader/Loader';
+import './Stock.css';
 
-function Stock({ setPage }) {
-    const [products, setProduct] = useState([]);
+const Stock = ({ setPage }) => {
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedType, setSelectedType] = useState(null);
     const [newProduct, setNewProduct] = useState({
         name: '',
-        price: '',  // Change to string
-        quantity: '',  // Change to string
+        price: '',
+        quantity: '',
         type: ''
     });
     const [editingProduct, setEditingProduct] = useState(null);
     const [editProductForm, setEditProductForm] = useState({
         name: '',
-        price: '',  // Change to string
-        quantity: '',  // Change to string
+        price: '',
+        quantity: '',
         type: ''
     });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
 
     useEffect(() => {
         setPage('Stock');
@@ -27,11 +33,10 @@ function Stock({ setPage }) {
     const loadProducts = async () => {
         try {
             const data = await getProducts();
-            if (Array.isArray(data)) setProduct(data);
-            else console.error("Les données reçues ne sont pas un tableau :", data);
+            setProducts(Array.isArray(data) ? data : []);
             setLoading(false);
-        } catch (error) {
-            console.error('Erreur lors du chargement des bières :', error);
+        } catch (err) {
+            setError('Erreur lors du chargement des produits');
             setLoading(false);
         }
     };
@@ -62,10 +67,20 @@ function Stock({ setPage }) {
         });
     };
 
+    const handleDeleteProduct = async (productId) => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+            try {
+                await deleteProduct(productId);
+                setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+            } catch (error) {
+                setError('Erreur lors de la suppression du produit');
+            }
+        }
+    };
+
     const handleProductSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate and convert values
         const productToAdd = {
             name: newProduct.name.trim(),
             price: parseFloat(newProduct.price),
@@ -73,26 +88,23 @@ function Stock({ setPage }) {
             type: newProduct.type
         };
 
-        // Additional validation
         if (!productToAdd.name || isNaN(productToAdd.price) || isNaN(productToAdd.quantity) || !productToAdd.type) {
-            alert('Please fill all fields correctly. Ensure price and quantity are valid numbers.');
+            setError('Veuillez remplir tous les champs correctement');
             return;
         }
 
         try {
-            console.log('Sending Product:', productToAdd);
             const addedProduct = await postProduct(productToAdd);
-            setProduct(prev => [...prev, addedProduct]);
+            setProducts(prev => [...prev, addedProduct]);
             setNewProduct({ name: '', price: '', quantity: '', type: '' });
-        } catch (error) {
-            console.error("Erreur lors de l'ajout du produit :", error);
-            alert('Error adding product. Please check the console for details.');
+            setIsModalOpen(false);
+        } catch (err) {
+            setError("Erreur lors de l'ajout du produit");
         }
     };
 
     const handleUpdateProductSubmit = async (productId) => {
         try {
-            // Validate and convert values
             const productData = {
                 name: editProductForm.name.trim(),
                 price: parseFloat(editProductForm.price),
@@ -101,159 +113,193 @@ function Stock({ setPage }) {
                 id: productId
             };
 
-            // Additional validation
             if (!productData.name || isNaN(productData.price) || isNaN(productData.quantity) || !productData.type) {
-                alert('Please fill all fields correctly. Ensure price and quantity are valid numbers.');
+                setError('Veuillez remplir tous les champs correctement');
                 return;
             }
 
             const updatedProduct = await putProduct(productId, productData);
-            setProduct(prev =>
-                prev.map(product => product.id === productId ? updatedProduct : product)
+            setProducts(prev =>
+                prev.map(product => (product.id === productId ? updatedProduct : product))
             );
             setEditingProduct(null);
-        } catch (error) {
-            console.error('Erreur lors de la modification de la bière :', error);
-            alert('Error updating product. Please check the console for details.');
+        } catch (err) {
+            setError('Erreur lors de la modification du produit');
         }
     };
 
-    if (loading) {
-        return <Loader message="Chargement du stock..." />;
-    }
+    if (loading) return <Loader message="Chargement des produits..." />;
+    if (error) return <div className="error-message">{error}</div>;
 
     return (
-        <div>
-            <header>
-                <h1 className="stock">Stock</h1>
-            </header>
-            <main>
-                <h2>Liste des bières</h2>
-                <div className="Products-list">
-                    {products.length > 0 ? (
-                        products.map((product) => (
-                            <div className="product-card" key={product.id}>
-                                {editingProduct === product.id ? (
-                                    <form
-                                        onSubmit={(e) => {
-                                            e.preventDefault();
-                                            handleUpdateProductSubmit(product.id);
-                                        }}
-                                    >
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={editProductForm.name || ''}
-                                            onChange={handleEditProductInputChange}
-                                            required
-                                        />
-                                        <input
-                                            type="number"
-                                            name="price"
-                                            value={editProductForm.price || ''}
-                                            onChange={handleEditProductInputChange}
-                                            step="0.01"
-                                            required
-                                        />
-                                        <input
-                                            type="number"
-                                            name="quantity"
-                                            value={editProductForm.quantity || ''}
-                                            onChange={handleEditProductInputChange}
-                                            required
-                                        />
-                                        <select
-                                            name="type"
-                                            value={editProductForm.type || ''}
-                                            onChange={handleEditProductInputChange}
-                                            required
-                                        >
-                                            <option value="">Sélectionnez un type</option>
-                                            <option value="Biere">Bière</option>
-                                            <option value="Vin">Vin</option>
-                                            <option value="Cookie">Cookie</option>
-                                            <option value="KinderBueno">Kinder Bueno</option>
-                                        </select>
-                                        <div className="button-group">
-                                            <button type="submit">Sauvegarder</button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setEditingProduct(null)}
-                                            >
-                                                Annuler
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <>
-                                        <h3>Nom : {product.name}</h3>
-                                        <p>Prix : {product.price}</p>
-                                        <p>Quantité : {product.quantity}</p>
-                                        <div className="button-group">
-                                            <button onClick={() => startEditingProduct(product)}>
-                                                Modifier
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteProduct(product.id)}
-                                                className="delete-button"
-                                            >
-                                                Supprimer
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ))
-                    ) : (
-                        <p>Chargement ou aucune bière disponible.</p>
-                    )}
-                </div>
-                <h2>Ajouter une bière</h2>
-                <form onSubmit={handleProductSubmit}>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Nom de la bière"
-                        value={newProduct.name}
-                        onChange={handleProductInputChange}
-                        required
-                    />
-                    <input
-                        type="number"
-                        name="price"
-                        placeholder="Prix de bière"
-                        value={newProduct.price}
-                        onChange={handleProductInputChange}
-                        step="0.01"
-                        required
-                    />
-                    <input
-                        type="number"
-                        name="quantity"
-                        placeholder="Quantité"
-                        value={newProduct.quantity}
-                        onChange={handleProductInputChange}
-                        required
-                    />
-                    <select
-                        name="type"
-                        value={newProduct.type}
-                        onChange={handleProductInputChange}
-                        required
-                    >
-                        <option value="">Sélectionnez un type</option>
-                        <option value="Biere">Bière</option>
-                        <option value="Vin">Vin</option>
-                        <option value="Cookie">Cookie</option>
-                        <option value="KinderBueno">Kinder Bueno</option>
-                    </select>
+        <div className="ventes-container">
+            <header className="header">
+                <h1>Stock</h1>
 
-                    <button type="submit">Ajouter</button>
-                </form>
+
+            </header>
+
+            <main>
+                <div className="filter-buttons">
+                    {productTypes.map((type) => (
+                        <button
+                            key={type}
+                            onClick={() => setSelectedType(type)}
+                            className={selectedType === type ? 'active' : ''}
+                        >
+                            {type}
+                        </button>
+                    ))}
+                    <button onClick={() => setSelectedType(null)}>Tout afficher</button>
+                </div>
+                {productTypes.map((type) => {
+                    if (selectedType && selectedType !== type) return null;
+                    const filteredProducts = products.filter((product) => product.type === type);
+                    if (filteredProducts.length === 0) return null;
+
+                    return (
+                        <div key={type} className={`product-group ${type.toLowerCase()}`}>
+                            <h2>{type}</h2>
+                            <div className="products-grid">
+                                {filteredProducts.map((product) => (
+                                    <div key={product.id} className="product-card">
+                                        {editingProduct === product.id ? (
+                                            <form onSubmit={(e) => {
+                                                e.preventDefault();
+                                                handleUpdateProductSubmit(product.id);
+                                            }}>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    value={editProductForm.name}
+                                                    onChange={handleEditProductInputChange}
+                                                    placeholder="Nom"
+                                                    required
+                                                />
+                                                <input
+                                                    type="number"
+                                                    name="price"
+                                                    value={editProductForm.price}
+                                                    onChange={handleEditProductInputChange}
+                                                    step="0.01"
+                                                    placeholder="Prix"
+                                                    required
+                                                />
+                                                <input
+                                                    type="number"
+                                                    name="quantity"
+                                                    value={editProductForm.quantity}
+                                                    onChange={handleEditProductInputChange}
+                                                    placeholder="Quantité"
+                                                    required
+                                                />
+                                                <select
+                                                    name="type"
+                                                    value={editProductForm.type}
+                                                    onChange={handleEditProductInputChange}
+                                                    required
+                                                >
+                                                    <option value="">Sélectionnez un type</option>
+                                                    {productTypes.map(type => (
+                                                        <option key={type} value={type}>
+                                                            {type}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <div className="button-group">
+                                                    <button type="submit">Sauvegarder</button>
+                                                    <button type="button" onClick={() => setEditingProduct(null)}>
+                                                        Annuler
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        ) : (
+                                            <>
+                                                <h3>{product.name}</h3>
+                                                <p>Prix : {product.price.toFixed(2)} €</p>
+                                                <p>Quantité : {product.quantity}</p>
+                                                <div className="button-group">
+                                                    <button onClick={() => startEditingProduct(product)}>
+                                                        Modifier
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteProduct(product.id)}
+                                                        className="delete-button"
+                                                    >
+                                                        Supprimer
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })}
             </main>
-            <footer>All Rights Reserved - BDE ENSC ©</footer>
+            <button
+                className="add-product-button"
+                onClick={() => setIsModalOpen(true)}
+            >
+                Ajouter un nouveau produit
+            </button>
+
+            {isModalOpen && (
+                <div className="modal-overlay active">
+                    <div className="modal-content">
+                        <h2>Ajouter un produit</h2>
+                        <form onSubmit={handleProductSubmit}>
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Nom du produit"
+                                value={newProduct.name}
+                                onChange={handleProductInputChange}
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="price"
+                                placeholder="Prix du produit"
+                                value={newProduct.price}
+                                onChange={handleProductInputChange}
+                                step="0.01"
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="quantity"
+                                placeholder="Quantité"
+                                value={newProduct.quantity}
+                                onChange={handleProductInputChange}
+                                required
+                            />
+                            <select
+                                name="type"
+                                value={newProduct.type}
+                                onChange={handleProductInputChange}
+                                required
+                            >
+                                <option value="">Sélectionnez un type</option>
+                                {productTypes.map(type => (
+                                    <option key={type} value={type}>
+                                        {type}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="button-group">
+                                <button type="submit">Ajouter</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)}>
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
-}
+};
 
 export default Stock;

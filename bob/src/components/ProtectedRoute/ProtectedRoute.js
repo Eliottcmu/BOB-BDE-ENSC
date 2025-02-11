@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { isAuthenticated } from '../../services/auth';
 import { getIsAdmin } from '../../services/api';
-import NoAccess from '../NoAccess/noAccess'; // Import the new component
+import NoAccess from '../NoAccess/noAccess';
 
 export const ProtectedRoute = ({ children, requireAdmin }) => {
     const [isAdmin, setIsAdmin] = useState(false);

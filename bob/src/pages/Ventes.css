@@ -1,206 +1,110 @@
-/* Variables CSS pour la cohérence des couleurs et des espaces */
-/* :root {
-    --primary-color: #111827;
-    --background-color: #f3f4f6;
-    --white: #ffffff;
-    --error-color: #ef4444;
-    --border-color: #e5e7eb;
-    --text-color: #374151;
-    --button-primary: #2563eb;
-    --button-disabled: #9ca3af;
-    --low-stock-color: #ef4444;
-    --header-height: 4rem;
-} */
-
-/* Styles de base et utilitaires */
-/* .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-} */
-
-/* Container principal */
-/* .ventes-container {
-    min-height: 100vh;
-    background-color: var(--background-color);
-    display: flex;
-    flex-direction: column;
+/* Container for each product type group */
+.product-group {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
 }
 
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+/* Group header style */
+.product-group h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: #333;
+}
+
+/* Grid layout for product cards within each group */
+.product-group .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
-.loader-logo {
-    width: 120px;
-    height: 120px;
-    animation: spin 2s linear infinite;
+/* Product card styles */
+.product-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.loading-text {
-    font-size: 1.1rem;
-    color: var(--primary-color);
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
+/* Specific styles for each product type group */
 
-    to {
-        transform: rotate(360deg);
-    }
-} */
+/* Bière group */
+.product-group.biere {
+    border-left: 6px solid #f39c12;
+    background-color: #fff8e1;
+}
 
-/* Message d'erreur */
-.error-message {
-    color: var(--error-color);
+/* Vin group */
+.product-group.vin {
+    border-left: 6px solid #8e44ad;
+    background-color: #f3e5f5;
+}
+
+/* Gouter group */
+.product-group.gouter {
+    border-left: 6px solid #27ae60;
+    background-color: #e8f5e9;
+}
+
+/* Miam group */
+.product-group.miam {
+    border-left: 6px solid #e74c3c;
+    background-color: #ffebee;
+}
+
+/* Sell button styles */
+.sell-button {
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.sell-button:hover {
+    background-color: #2980b9;
+}
+
+.sell-button:disabled,
+.sell-button.disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Header styles */
+.header {
+    padding: 2rem;
     text-align: center;
-    padding: 1rem;
-    margin: 1rem;
-    background-color: var(--white);
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Header */
-/* .header {
-    background-color: var(--white);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.header-content {
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
+    background-color: #f8f8f8;
 }
 
 .header h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
+    margin: 0;
+    font-size: 2rem;
+    color: #2c3e50;
 }
 
-@media (min-width: 768px) {
-    .header h1 {
-        font-size: 1.875rem;
-    }
-} */
-
-/* Contenu principal */
-/* .main-content {
-    flex: 1;
-    max-width: 80rem;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
-    width: 100%;
-} */
-
-/* Grille des bières */
-/* .beer-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .beer-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .beer-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-} */
-
-/* Carte de bière */
-/* .beer-card {
-    background-color: var(--white);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-}
-
-.beer-card h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
-.beer-info {
-    margin-top: 1rem;
-}
-
-.beer-info p {
-    color: var(--text-color);
-    margin: 0.5rem 0;
-}
-
-.low-stock {
-    color: var(--low-stock-color);
-    font-weight: 600;
-} */
-
-/* Bouton de vente */
-/* .sell-button {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.375rem;
-    color: var(--white);
-    font-weight: 500;
-    background-color: var(--button-primary);
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.sell-button.disabled {
-    background-color: var(--button-disabled);
-    cursor: not-allowed;
-} */
-
-/* Footer */
-/* .footer {
-    background-color: var(--white);
-    padding: 1rem;
+/* Footer styles */
+.footer {
     text-align: center;
-    margin-top: auto;
-} */
+    padding: 2rem;
+    color: #666;
+    margin-top: 4rem;
+}
 
-/* Styles d'impression */
-/* @media print {
-    .ventes-container {
-        background: var(--white);
-    }
-
-    .header {
-        box-shadow: none;
-    }
-
-    .beer-card {
-        box-shadow: none;
-        border: 1px solid var(--border-color);
-        break-inside: avoid;
-    }
-
-    .sell-button {
-        display: none;
-    }
-} */
+/* Optional: Error message styling */
+.error-message {
+    text-align: center;
+    color: red;
+    margin: 2rem 0;
+}
