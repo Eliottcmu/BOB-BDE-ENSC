@@ -1,22 +1,25 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { getVentes, deleteVente, deleteAllVentes } from '../services/api';
+import {
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Paper, Button, TextField, Select, MenuItem, Grid, Box, Typography,
+    IconButton
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import frLocale from 'date-fns/locale/fr';
 import Loader from '../components/Loader/Loader';
+import './Tresorerie.css';
 
 function formatDateTime(datetime) {
     if (!datetime || datetime === 'Invalid Date') return '';
     const date = new Date(datetime);
     if (isNaN(date.getTime())) return '';
-
-    const options = {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-    };
-
-    return new Intl.DateTimeFormat('fr-FR', options).format(date);
+    return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: false
+    }).format(date);
 }
 
 const Tresorerie = ({ setPage }) => {
@@ -25,138 +28,34 @@ const Tresorerie = ({ setPage }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [total, setTotal] = useState(0);
-
-    const [dateStart, setDateStart] = useState('');
-    const [dateEnd, setDateEnd] = useState('');
+    const [dateStart, setDateStart] = useState(null);
+    const [dateEnd, setDateEnd] = useState(null);
     const [produitFilter, setProduitFilter] = useState('');
     const [groupBy, setGroupBy] = useState('none');
+    const [displayCount, setDisplayCount] = useState(15);
 
-    const productList = useMemo(() => {
-        return [...new Set(ventes.map(vente => vente.name))].sort();
-    }, [ventes]);
+    const productList = useMemo(() =>
+        [...new Set(ventes.map(vente => vente.name))].sort(), [ventes]
+    );
 
-
-    useEffect(() => {
-        setPage('Tresorerie');
-        loadVentes();
-    }, [setPage]);
-
-    const loadVentes = async () => {
-        try {
-            const data = await getVentes();
-
-            const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-            setVentes(sortedData);
-            setFilteredVentes(sortedData);
-            updateTotal(sortedData);
-            setLoading(false);
-        } catch (err) {
-            setError('Erreur lors du chargement des ventes');
-            setLoading(false);
-        }
-    };
-
-    const updateTotal = (data) => {
-        const totalVentes = data.reduce((acc, vente) => acc + vente.montant, 0);
-        setTotal(totalVentes);
-    };
-    const handleDeleteVente = async (venteId) => {
-        const confirmDelete = window.confirm('Êtes-vous sûr de vouloir supprimer cette vente ?');
-        if (confirmDelete) {
+    React.useEffect(() => {
+        const fetchVentes = async () => {
             try {
-                await deleteVente(venteId);
-                const updatedVentes = ventes.filter(vente => vente.id !== venteId);
-                setVentes(updatedVentes);
-                setFilteredVentes(updatedVentes);
-                updateTotal(updatedVentes);
+                const data = await getVentes();
+                setVentes(data);
+                setFilteredVentes(data);
+                setTotal(data.reduce((sum, vente) => sum + vente.montant, 0));
+                setError(null);
             } catch (err) {
-                setError('Erreur lors de la suppression de la vente');
+                setError('Erreur lors du chargement des ventes');
+            } finally {
+                setLoading(false);
             }
-        }
-    };
+        };
 
-    const handleResetAllVentes = async () => {
-        const confirmReset = window.confirm('Êtes-vous sûr de vouloir supprimer toutes les ventes ?');
-        if (confirmReset) {
-            try {
-                await deleteAllVentes();
-                setVentes([]);
-                setFilteredVentes([]);
-                setTotal(0);
-            } catch (err) {
-                setError('Erreur lors de la suppression de toutes les ventes');
-            }
-        }
-    };
+        fetchVentes();
+    }, []);
 
-    const applyFilters = () => {
-        let filtered = [...ventes];
-
-        if (dateStart) {
-            filtered = filtered.filter(vente => new Date(vente.date) >= new Date(dateStart));
-        }
-        if (dateEnd) {
-            filtered = filtered.filter(vente => new Date(vente.date) <= new Date(dateEnd));
-        }
-        if (produitFilter) {
-            filtered = filtered.filter(vente => vente.name === produitFilter);
-        }
-
-        setFilteredVentes(filtered);
-        updateTotal(filtered);
-    };
-
-    const resetFilters = () => {
-        setDateStart('');
-        setDateEnd('');
-        setProduitFilter('');
-        setGroupBy('none');
-        setFilteredVentes(ventes);
-        updateTotal(ventes);
-    };
-
-    const groupVentes = (ventes) => {
-        if (groupBy === 'none') return ventes;
-
-        const grouped = {};
-        ventes.forEach(vente => {
-            let key = '';
-            const date = new Date(vente.date);
-
-            switch (groupBy) {
-                case 'day':
-                    key = date.toLocaleDateString();
-                    break;
-                case 'month':
-                    key = `${date.getMonth() + 1}/${date.getFullYear()}`;
-                    break;
-                case 'year':
-                    key = date.getFullYear().toString();
-                    break;
-                default:
-                    return vente;
-            }
-
-            if (!grouped[key]) {
-                grouped[key] = {
-                    date: key,
-                    name: `Total ${key}`,
-                    montant: 0,
-                    entries: []
-                };
-            }
-            grouped[key].montant += vente.montant;
-            grouped[key].entries.push(vente);
-        });
-
-
-        return Object.values(grouped).sort((a, b) => new Date(b.date) - new Date(a.date));
-    };
-
-    if (loading) return <Loader message="Chargement de la trésorerie..." />;
-    if (error) return <div className="error-message" role="alert">{error}</div>;
-
-    const groupedVentes = groupVentes(filteredVentes);
     const groupOptions = [
         { value: 'none', label: 'Pas de groupement' },
         { value: 'day', label: 'Par jour' },
@@ -164,122 +63,220 @@ const Tresorerie = ({ setPage }) => {
         { value: 'year', label: 'Par année' }
     ];
 
+    const groupVentes = (ventes) => {
+        if (groupBy === 'none') return ventes;
+
+        const grouped = ventes.reduce((acc, vente) => {
+            const date = new Date(vente.date);
+            let key;
+
+            switch (groupBy) {
+                case 'day':
+                    key = date.toISOString().split('T')[0];
+                    break;
+                case 'month':
+                    key = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                    break;
+                case 'year':
+                    key = `${date.getFullYear()}`;
+                    break;
+                default:
+                    key = vente.date;
+            }
+
+            if (!acc[key]) {
+                acc[key] = {
+                    id: key,
+                    date: key,
+                    name: 'Groupe',
+                    montant: 0,
+                    entries: []
+                };
+            }
+            acc[key].montant += vente.montant;
+            acc[key].entries.push(vente);
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const applyFilters = () => {
+        let filtered = ventes;
+
+        if (dateStart) {
+            filtered = filtered.filter(vente => new Date(vente.date) >= dateStart);
+        }
+        if (dateEnd) {
+            filtered = filtered.filter(vente => new Date(vente.date) <= dateEnd);
+        }
+        if (produitFilter) {
+            filtered = filtered.filter(vente => vente.name === produitFilter);
+        }
+
+        setFilteredVentes(filtered);
+        setTotal(filtered.reduce((sum, vente) => sum + vente.montant, 0));
+        setDisplayCount(15);
+    };
+
+    const resetFilters = () => {
+        setDateStart(null);
+        setDateEnd(null);
+        setProduitFilter('');
+        setFilteredVentes(ventes);
+        setTotal(ventes.reduce((sum, vente) => sum + vente.montant, 0));
+        setDisplayCount(15);
+    };
+
+    const handleShowMore = () => {
+        setDisplayCount(prevCount => prevCount + 15);
+    };
+
+    const handleDeleteVente = async (venteId) => {
+        try {
+            await deleteVente(venteId);
+            const updatedVentes = ventes.filter(vente => vente.id !== venteId);
+            setVentes(updatedVentes);
+            setFilteredVentes(updatedVentes);
+            setTotal(updatedVentes.reduce((sum, vente) => sum + vente.montant, 0));
+        } catch (error) {
+            setError('Erreur lors de la suppression');
+        }
+    };
+
+    const handleResetAllVentes = async () => {
+        try {
+            await deleteAllVentes();
+            setVentes([]);
+            setFilteredVentes([]);
+            setTotal(0);
+        } catch (error) {
+            setError('Erreur lors de la réinitialisation');
+        }
+    };
+
+    if (loading) return <Loader message="Chargement de la trésorerie..." />;
+    if (error) return <Typography color="error">{error}</Typography>;
+
+    const displayVentes = groupVentes(filteredVentes).slice(0, displayCount);
+    const hasMore = displayCount < groupVentes(filteredVentes).length;
+
     return (
-        <div className="tresorerie-container">
-            <header className="header" role="banner">
-                <h1>Trésorerie</h1>
+        <Box id="tresorerie-container" className="tresorerie-wrapper">
+            <Typography variant="h4" gutterBottom className="title">Trésorerie</Typography>
 
-            </header>
-
-            <main className="main-content">
-                <div className="filters-container">
-                    <div className="filters-grid">
-                        <div className="filter-item">
-                            <p>penser à faire plusieurs pages pour eviter de faire charger trop de trucs : changer l'api</p>
-                            <label>Date début</label>
-                            <input
-                                type="date"
+            <Paper className="filter-section">
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
+                            <DatePicker
+                                label="Date début"
                                 value={dateStart}
-                                onChange={(e) => setDateStart(e.target.value)}
-                                className="filter-input"
+                                onChange={setDateStart}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
                             />
-                        </div>
-
-                        <div className="filter-item">
-                            <label>Date fin</label>
-                            <input
-                                type="date"
+                        </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
+                            <DatePicker
+                                label="Date fin"
                                 value={dateEnd}
-                                onChange={(e) => setDateEnd(e.target.value)}
-                                className="filter-input"
+                                onChange={setDateEnd}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
                             />
-                        </div>
-
-                        <div className="filter-item">
-                            <label>Produit</label>
-                            <select
-                                value={produitFilter}
-                                onChange={(e) => setProduitFilter(e.target.value)}
-                                className="filter-input"
-                            >
-                                <option value="">Tous les produits</option>
-                                {productList.map(product => (
-                                    <option key={product} value={product}>
-                                        {product}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="filter-item">
-                            <label>Groupement</label>
-                            <select
-                                value={groupBy}
-                                onChange={(e) => setGroupBy(e.target.value)}
-                                className="filter-input"
-                            >
-                                {groupOptions.map(opt => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="filter-actions">
-                        <button onClick={applyFilters} className="btn btn-primary">
-                            Appliquer
-                        </button>
-                        <button onClick={resetFilters} className="btn btn-secondary">
-                            Réinitialiser
-                        </button>
-                    </div>
-                </div>
-                <div className="table-actions">
-                    <button
-                        onClick={handleResetAllVentes}
-                        className="btn btn-danger"
-                    >
-                        Réinitialiser toutes les ventes
-                    </button>
-                </div>
-                <div className="total-card">
-                    <h2>Total des ventes: <span>{total.toFixed(2)} €</span></h2>
-                </div>
-
-                <div className="table-container">
-                    <table className="sales-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Produit</th>
-                                <th>Montant</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {groupedVentes.map((vente, index) => (
-                                <tr key={index}>
-                                    <td data-label="Date">{formatDateTime(vente.date)}</td>
-                                    <td data-label="Produit">{vente.name}</td>
-                                    <td data-label="Montant">{vente.montant.toFixed(2)} €</td>
-                                    <td data-label="Actions">
-                                        {!vente.entries && ( // Only show delete for individual entries, not grouped
-                                            <button
-                                                onClick={() => handleDeleteVente(vente.id)}
-                                                className="btn btn-sm btn-danger"
-                                            >
-                                                Supprimer
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
+                        </LocalizationProvider>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Select
+                            fullWidth
+                            value={produitFilter}
+                            onChange={(e) => setProduitFilter(e.target.value)}
+                            className="filter-select"
+                        >
+                            <MenuItem value="">Tous les produits</MenuItem>
+                            {productList.map(product => (
+                                <MenuItem key={product} value={product}>{product}</MenuItem>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-            </main>
-        </div>
+                        </Select>
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Select
+                            fullWidth
+                            value={groupBy}
+                            onChange={(e) => setGroupBy(e.target.value)}
+                            className="filter-select"
+                        >
+                            {groupOptions.map(opt => (
+                                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </Grid>
+                </Grid>
+                <Box className="button-group">
+                    <Button variant="contained" onClick={applyFilters} className="apply-button">Appliquer</Button>
+                    <Button variant="outlined" onClick={resetFilters} className="reset-button">Réinitialiser</Button>
+                </Box>
+            </Paper>
+
+            <Paper className="summary-section">
+                <Typography variant="h6">Total des ventes: {total.toFixed(2)} €</Typography>
+            </Paper>
+
+            <TableContainer component={Paper} className="table-container">
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Produit</TableCell>
+                            <TableCell align="right">Montant</TableCell>
+                            <TableCell align="right">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {displayVentes.map((vente) => (
+                            <TableRow key={vente.id} className="vente-row">
+                                <TableCell>{formatDateTime(vente.date)}</TableCell>
+                                <TableCell>{vente.name}</TableCell>
+                                <TableCell align="right">{vente.montant.toFixed(2)} €</TableCell>
+                                <TableCell align="right">
+                                    {!vente.entries && (
+                                        <IconButton
+                                            onClick={() => handleDeleteVente(vente.id)}
+                                            color="error"
+                                            size="small"
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {hasMore && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleShowMore}
+                    >
+                        Afficher plus
+                    </Button>
+                </Box>
+            )}
+
+            <Box className="reset-section">
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleResetAllVentes}
+                >
+                    Réinitialiser toutes les ventes
+                </Button>
+            </Box>
+        </Box>
     );
 };
 

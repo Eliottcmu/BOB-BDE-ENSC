@@ -238,67 +238,71 @@ const Stock = ({ setPage }) => {
                     );
                 })}
             </main>
-            <button
-                className="add-product-button"
-                onClick={() => setIsModalOpen(true)}
-            >
-                Ajouter un nouveau produit
-            </button>
+            <div className="add-product-container">
+                <button
+                    className="add-product-button"
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    Ajouter un nouveau produit
+                </button>
+            </div>
 
-            {isModalOpen && (
-                <div className="modal-overlay active">
-                    <div className="modal-content">
-                        <h2>Ajouter un produit</h2>
-                        <form onSubmit={handleProductSubmit}>
-                            <input
-                                type="text"
-                                name="name"
-                                placeholder="Nom du produit"
-                                value={newProduct.name}
-                                onChange={handleProductInputChange}
-                                required
-                            />
-                            <input
-                                type="number"
-                                name="price"
-                                placeholder="Prix du produit"
-                                value={newProduct.price}
-                                onChange={handleProductInputChange}
-                                step="0.01"
-                                required
-                            />
-                            <input
-                                type="number"
-                                name="quantity"
-                                placeholder="Quantité"
-                                value={newProduct.quantity}
-                                onChange={handleProductInputChange}
-                                required
-                            />
-                            <select
-                                name="type"
-                                value={newProduct.type}
-                                onChange={handleProductInputChange}
-                                required
-                            >
-                                <option value="">Sélectionnez un type</option>
-                                {productTypes.map(type => (
-                                    <option key={type} value={type}>
-                                        {type}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="button-group">
-                                <button type="submit">Ajouter</button>
-                                <button type="button" onClick={() => setIsModalOpen(false)}>
-                                    Annuler
-                                </button>
-                            </div>
-                        </form>
+            {
+                isModalOpen && (
+                    <div className="modal-overlay active">
+                        <div className="modal-content">
+                            <h2>Ajouter un produit</h2>
+                            <form onSubmit={handleProductSubmit}>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Nom du produit"
+                                    value={newProduct.name}
+                                    onChange={handleProductInputChange}
+                                    required
+                                />
+                                <input
+                                    type="number"
+                                    name="price"
+                                    placeholder="Prix du produit"
+                                    value={newProduct.price}
+                                    onChange={handleProductInputChange}
+                                    step="0.01"
+                                    required
+                                />
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    placeholder="Quantité"
+                                    value={newProduct.quantity}
+                                    onChange={handleProductInputChange}
+                                    required
+                                />
+                                <select
+                                    name="type"
+                                    value={newProduct.type}
+                                    onChange={handleProductInputChange}
+                                    required
+                                >
+                                    <option value="">Sélectionnez un type</option>
+                                    {productTypes.map(type => (
+                                        <option key={type} value={type}>
+                                            {type}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="button-group">
+                                    <button type="submit">Ajouter</button>
+                                    <button type="button" onClick={() => setIsModalOpen(false)}>
+                                        Annuler
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 
