@@ -43,6 +43,7 @@ const Ventes = ({ setPage }) => {
                 quantite: 1,
                 montant: product.price,
                 name: product.name,
+                type: product.type
             };
 
             await postVentes(vente);

@@ -45,6 +45,7 @@ const TresorerieTable = ({
                             <TableCell>Produit</TableCell>
                             <TableCell align="right">Montant</TableCell>
                             <TableCell align="right">Actions</TableCell>
+                            <TableCell align="right">Type Règlement</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -64,6 +65,7 @@ const TresorerieTable = ({
                                         </IconButton>
                                     )}
                                 </TableCell>
+                                <TableCell align="right">{vente.typeReglement}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

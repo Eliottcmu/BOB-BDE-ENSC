@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getUsers, postUser, putUser, deleteUser } from '../services/api';
 import Loader from '../components/Loader/Loader';
 import { Eye, EyeOff } from 'lucide-react';
+import './ListUser.css';
 
 const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -157,7 +158,9 @@ const ListUser = () => {
     return (
         <div className="profile-page">
             <div className="users-section">
-                <h1>Liste des utilisateurs</h1>
+                <header className='header'>
+                    <h1>Liste des utilisateurs</h1>
+                </header>
                 <div className="users-list">
                     {users.map((user) => (
                         <div className="user-card" key={user.id}>
@@ -224,7 +227,7 @@ const ListUser = () => {
                                 </form>
                             ) : (
                                 <>
-                                    <h2>Name : {user.name}</h2>
+                                    <p>Name : {user.name}</p>
                                     <p>Email : {user.email}</p>
                                     <div className="password-display">
                                         <p>
@@ -238,7 +241,7 @@ const ListUser = () => {
                                         </p>
                                     </div>
                                     <div className="button-group">
-                                        <button onClick={() => startEditing(user)}>Modifier</button>
+                                        <button className='btn-modif-users' onClick={() => startEditing(user)}>Modifier</button>
                                         <button onClick={() => handleDeleteUser(user.id)} className="delete-button">
                                             Supprimer
                                         </button>
@@ -249,7 +252,7 @@ const ListUser = () => {
                     ))}
                 </div>
                 <div className="form-new-user">
-                    <h2>Ajouter un utilisateur</h2>
+                    <p>Ajouter un utilisateur</p>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <input

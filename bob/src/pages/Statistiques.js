@@ -159,7 +159,7 @@ const Statistiques = ({ setPage }) => {
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />
-                                    <Line type="monotone" dataKey="montant" stroke="#8884d8" />
+                                    <Line type="monotone" dataKey="montant" />
                                 </LineChart>
                             </ResponsiveContainer>
                         </CardContent>

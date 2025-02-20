@@ -111,7 +111,9 @@ const Profile = () => {
 
     return (
         <div className="personal-profile">
-            <h1>Mon Profil</h1>
+            <header className='header'>
+                <h1>Mon Profil</h1>
+            </header>
             {!editMode ? (
                 <div className="profile-view">
                     <p><strong>Nom :</strong> {userProfile.name}</p>

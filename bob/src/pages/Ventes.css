@@ -1,4 +1,3 @@
-/* Container for each product type group */
 .product-group {
     margin-bottom: 2rem;
     padding: 1rem;
@@ -34,8 +33,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Specific styles for each product type group */
-
 /* Bière group */
 .product-group.biere {
     border-left: 6px solid #f39c12;
@@ -54,7 +51,6 @@
     background-color: #e8f5e9;
 }
 
-/* Miam group */
 .product-group.miam {
     border-left: 6px solid #e74c3c;
     background-color: #ffebee;
@@ -62,7 +58,7 @@
 
 /* Sell button styles */
 .sell-button {
-    background-color: #3498db;
+    background-color: #2974c8;
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -71,28 +67,13 @@
     transition: background-color 0.2s ease;
 }
 
-.sell-button:hover {
-    background-color: #2980b9;
-}
-
 .sell-button:disabled,
 .sell-button.disabled {
     background-color: #aaa;
     cursor: not-allowed;
 }
 
-/* Header styles */
-.header {
-    padding: 2rem;
-    text-align: center;
-    background-color: #f8f8f8;
-}
 
-.header h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: #2c3e50;
-}
 
 /* Footer styles */
 .footer {
