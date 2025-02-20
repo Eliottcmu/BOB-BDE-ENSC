@@ -30,7 +30,8 @@ const App = () => {
       <>
         <NavBar setPage={setPage} />
         <Routes>
-          <Route path="/" element={<PageWrapper component={Home} />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<PageWrapper component={Home} />} />
           <Route path="/ventes" element={<PageWrapper component={Ventes} />} />
           <Route path="/profile" element={<PageWrapper component={Profile} />} />
           <Route path="/stock" element={<PageWrapper component={Stock} />} />
@@ -64,10 +65,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Route publique pour la connexion */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/login" element={<Login />} />
-
-        {/* Toutes les autres routes passent par le layout authentifié */}
         <Route path="/*" element={<AuthenticatedLayout />} />
       </Routes>
     </BrowserRouter>

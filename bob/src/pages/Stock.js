@@ -135,8 +135,6 @@ const Stock = ({ setPage }) => {
         <div className="ventes-container">
             <header className="header">
                 <h1>Stock</h1>
-
-
             </header>
 
             <main>

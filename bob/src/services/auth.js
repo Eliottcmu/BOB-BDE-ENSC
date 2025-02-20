@@ -19,9 +19,9 @@ export const loginUser = async (credentials) => {
 
         // Stockage des informations d'authentification
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify({
-            id: user.id
-        }));
+        // localStorage.setItem('user', JSON.stringify({
+        //     id: user.id
+        // }));
 
         return user;
     } catch (error) {
@@ -64,7 +64,7 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response?.status === 401) {
-            // Token expiré ou invalide
+            // si token expiré ou invalide
             logout();
             window.location.href = '/login';
         }

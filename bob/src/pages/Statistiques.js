@@ -123,41 +123,31 @@ const Statistiques = ({ setPage }) => {
             });
     };
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+    const COLORS = ['#105A5B', '#DA3232', '#EFDAC0', '#FF8042', '#E79B3B'];
 
     if (loading) {
         return <Loader message="Chargement des statistiques..." />;
     }
 
     return (
-        <div className="p-6">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold">Statistiques des Ventes</h1>
+        <div className="statistiques-container">
+            <header className="header">
+                <h1>Statistiques</h1>
             </header>
 
-            <main className="space-y-8">
-                {/* Previous statistics cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* ... (previous cards remain the same) ... */}
-                </div>
+            <main>
+                <select
+                    className="select-product"
+                    value={selectedProduct}
+                    onChange={(e) => setSelectedProduct(e.target.value)}
+                >
+                    <option value="all">Tous les produits</option>
+                    {productsData.map(product => (
+                        <option key={product.id} value={product.name}>{product.name}</option>
+                    ))}
+                </select>
 
-                {/* Product selector for time-based analysis */}
-                <div className="flex justify-end mb-4">
-                    <select
-                        className="p-2 border rounded"
-                        value={selectedProduct}
-                        onChange={(e) => setSelectedProduct(e.target.value)}
-                    >
-                        <option value="all">Tous les produits</option>
-                        {productsData.map(product => (
-                            <option key={product.id} value={product.name}>{product.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* All graphs */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {/* Previous graphs */}
+                <div className="stats-grid">
                     <Card>
                         <CardHeader>
                             <CardTitle>Évolution des Ventes</CardTitle>
@@ -255,7 +245,7 @@ const Statistiques = ({ setPage }) => {
                 </div>
             </main>
 
-            <footer className="mt-8 text-center text-gray-600">
+            <footer>
                 All Rights Reserved - BDE ENSC ©
             </footer>
         </div>
