@@ -9,6 +9,10 @@ const Ventes = ({ setPage }) => {
     const [error, setError] = useState(null);
     const [selectedType, setSelectedType] = useState(null);
 
+    // State to hold the product being sold and to toggle the dialog
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
     const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
 
     useEffect(() => {
@@ -27,29 +31,44 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    const handleSell = async (product) => {
+    // Opens the payment dialog for the chosen product
+    const openPaymentDialog = (product) => {
         if (product.quantity <= 0) {
             alert('Plus de stock disponible pour ce produit !');
             return;
         }
+        setSelectedProduct(product);
+        setIsDialogOpen(true);
+    };
+
+    // Handles the final sale process based on the chosen payment method
+    const handlePaymentSelection = async (paymentMethod) => {
+        if (!selectedProduct) return;
 
         try {
-            const updatedProduct = { ...product, quantity: product.quantity - 1 };
-            await putProduct(product.id, updatedProduct);
+            // Decrease product quantity
+            const updatedProduct = { ...selectedProduct, quantity: selectedProduct.quantity - 1 };
+            await putProduct(selectedProduct.id, updatedProduct);
+
+            // Map payment method to typeReglement: 'cash' for cash, 'lydia' for QR code
+            const typeReglement = paymentMethod === 'cash' ? 'cash' : 'lydia';
 
             const vente = {
                 date: new Date(),
-                idProduit: product.id,
+                idProduit: selectedProduct.id,
                 quantite: 1,
-                montant: product.price,
-                name: product.name,
-                type: product.type
+                montant: selectedProduct.price,
+                name: selectedProduct.name,
+                typeReglement: typeReglement
             };
-
             await postVentes(vente);
             loadProducts();
         } catch (err) {
             setError('Erreur lors de la vente');
+        } finally {
+            // Close the dialog and clear the selected product
+            setIsDialogOpen(false);
+            setSelectedProduct(null);
         }
     };
 
@@ -60,6 +79,10 @@ const Ventes = ({ setPage }) => {
         <div className="ventes-container">
             <header className="header">
                 <h1>Ventes</h1>
+
+            </header>
+
+            <main>
                 <div className="filter-buttons">
                     {productTypes.map((type) => (
                         <button
@@ -72,9 +95,6 @@ const Ventes = ({ setPage }) => {
                     ))}
                     <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
-            </header>
-
-            <main>
                 {productTypes.map((type) => {
                     if (selectedType && selectedType !== type) return null;
                     const filteredProducts = products.filter((product) => product.type === type);
@@ -90,7 +110,7 @@ const Ventes = ({ setPage }) => {
                                         <p>Prix : {product.price.toFixed(2)} €</p>
                                         <p>Quantité : {product.quantity}</p>
                                         <button
-                                            onClick={() => handleSell(product)}
+                                            onClick={() => openPaymentDialog(product)}
                                             disabled={product.quantity <= 0}
                                             className="sell-button"
                                         >
@@ -103,7 +123,27 @@ const Ventes = ({ setPage }) => {
                     );
                 })}
             </main>
-        </div>
+
+            {/* Modal Dialog for Payment Method Selection */}
+            {isDialogOpen && (
+                <div className="modalOverlayStyle">
+                    <div className='modalStyle'>
+                        <h2>Choisissez le mode de paiement</h2>
+                        <button onClick={() => handlePaymentSelection('cash')}>Cash</button>
+                        <button onClick={() => handlePaymentSelection('qrcode')}>QR Code</button>
+                        <button
+                            onClick={() => {
+                                setIsDialogOpen(false);
+                                setSelectedProduct(null);
+                            }}
+                        >
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            )
+            }
+        </div >
     );
 };
 

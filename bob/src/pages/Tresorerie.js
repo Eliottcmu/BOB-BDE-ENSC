@@ -7,6 +7,7 @@ import Loader from '../components/Loader/Loader';
 import './Tresorerie.css';
 import TresorerieFilters from '../components/TresorerieFilter/TresorerieFilter';
 import TresorerieTable from '../components/TresorerieTable/TresorerieTable';
+import ResetSalesDialog from '../components/ResetSalesDialog/ResetSalesDialog';
 
 function formatDateTime(datetime) {
     if (!datetime || datetime === 'Invalid Date') return '';
@@ -163,10 +164,9 @@ const Tresorerie = ({ setPage }) => {
             setVentes([]);
             setFilteredVentes([]);
             setTotal(0);
+            setResetDialogOpen(false);
         } catch (error) {
             setError('Erreur lors de la réinitialisation');
-        } finally {
-            setResetDialogOpen(false);
         }
     };
 
@@ -228,6 +228,11 @@ const Tresorerie = ({ setPage }) => {
                     />
                 </Box>
             </Box>
+            <ResetSalesDialog
+                open={resetDialogOpen}
+                onClose={() => setResetDialogOpen(false)}
+                onConfirm={confirmReset}
+            />
         </div>
     );
 };
