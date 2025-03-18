@@ -8,10 +8,9 @@ const Ventes = ({ setPage }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedType, setSelectedType] = useState(null);
-
-    // State to hold the product being sold and to toggle the dialog
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [cart, setCart] = useState([]);
 
     const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
 
@@ -41,34 +40,63 @@ const Ventes = ({ setPage }) => {
         setIsDialogOpen(true);
     };
 
-    // Handles the final sale process based on the chosen payment method
+    // Ajoute un produit au panier si le stock le permet
+    const addToCart = (product) => {
+        // Vérifier le nombre déjà ajouté dans le panier pour ce produit
+        const cartItem = cart.find(item => item.id === product.id);
+        const quantityInCart = cartItem ? cartItem.quantity : 0;
+        if (quantityInCart < product.quantity) {
+            if (cartItem) {
+                setCart(cart.map(item =>
+                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                ));
+            } else {
+                setCart([...cart, { ...product, quantity: 1 }]);
+            }
+        } else {
+            alert('Plus de stock disponible pour ce produit !');
+        }
+    };
+
+    // Calcul du total du panier
+    const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    // Ouvre la validation du panier pour choisir le mode de paiement
+    const handleCartValidation = () => {
+        if (cart.length === 0) {
+            alert("Le panier est vide !");
+            return;
+        }
+        setIsDialogOpen(true);
+    };
+
+    // Gestion du paiement pour tous les produits du panier
     const handlePaymentSelection = async (paymentMethod) => {
-        if (!selectedProduct) return;
-
         try {
-            // Decrease product quantity
-            const updatedProduct = { ...selectedProduct, quantity: selectedProduct.quantity - 1 };
-            await putProduct(selectedProduct.id, updatedProduct);
-
-            // Map payment method to typeReglement: 'cash' for cash, 'lydia' for QR code
-            const typeReglement = paymentMethod === 'cash' ? 'cash' : 'lydia';
-
-            const vente = {
-                date: new Date(),
-                idProduit: selectedProduct.id,
-                quantite: 1,
-                montant: selectedProduct.price,
-                name: selectedProduct.name,
-                typeReglement: typeReglement
-            };
-            await postVentes(vente);
+            // Traiter chaque produit du panier
+            for (const item of cart) {
+                // Récupérer le produit dans la liste pour connaître le stock actuel
+                const productToUpdate = products.find(prod => prod.id === item.id);
+                if (productToUpdate) {
+                    const newQuantity = productToUpdate.quantity - item.quantity;
+                    await putProduct(item.id, { ...productToUpdate, quantity: newQuantity });
+                    const vente = {
+                        date: new Date(),
+                        idProduit: item.id,
+                        quantite: item.quantity,
+                        montant: item.price * item.quantity,
+                        name: item.name,
+                        typeReglement: paymentMethod === 'cash' ? 'cash' : 'lydia'
+                    };
+                    await postVentes(vente);
+                }
+            }
             loadProducts();
         } catch (err) {
             setError('Erreur lors de la vente');
         } finally {
-            // Close the dialog and clear the selected product
             setIsDialogOpen(false);
-            setSelectedProduct(null);
+            setCart([]); // Réinitialiser le panier après la vente
         }
     };
 
@@ -79,7 +107,16 @@ const Ventes = ({ setPage }) => {
         <div className="ventes-container">
             <header className="header">
                 <h1>Ventes</h1>
-
+                <div className="cart-summary">
+                    <span>Total du panier: {cartTotal.toFixed(2)}€</span>
+                    <button onClick={handleCartValidation}>Valider le panier</button>
+                </div>
+                {/* Bouton pour vider le panier */}
+                {cart.length > 0 && (
+                    <div className="clear-cart">
+                        <button onClick={() => setCart([])}>Vider le panier</button>
+                    </div>
+                )}
             </header>
 
             <main>
@@ -105,17 +142,25 @@ const Ventes = ({ setPage }) => {
                             <h2>{type}</h2>
                             <div className="products-grid">
                                 {filteredProducts.map((product) => (
-                                    <div key={product.id} className="product-card">
+                                    <div
+                                        key={product.id}
+                                        className="product-card"
+                                        onClick={() => addToCart(product)}
+                                    >
+                                        <img
+                                            src={`../../public/${product.name}.png`}
+                                            alt={product.name}
+                                            className="product-image"
+                                        />
+
                                         <h3>{product.name}</h3>
-                                        <p>Prix : {product.price.toFixed(2)} €</p>
-                                        <p>Quantité : {product.quantity}</p>
-                                        <button
-                                            onClick={() => openPaymentDialog(product)}
-                                            disabled={product.quantity <= 0}
-                                            className="sell-button"
-                                        >
-                                            {product.quantity <= 0 ? 'Rupture de stock' : 'Vendre'}
-                                        </button>
+                                        <h2>{product.price.toFixed(2)}€</h2>
+                                        <p>Stock : {product.quantity}</p>
+                                        {cart.find(item => item.id === product.id) && (
+                                            <p>
+                                                Ajouté au panier : {cart.find(item => item.id === product.id).quantity}
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>

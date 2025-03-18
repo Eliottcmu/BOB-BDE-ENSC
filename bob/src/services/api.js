@@ -169,46 +169,6 @@ export const deleteAllVentes = async () => {
     }
 };
 
-export const getLeaderboard = async (limit = 10) => {
-    try {
-        const response = await axiosInstance.get(`${BASE_URL}/scores/leaderboard?limit=${limit}`);
-        return response.data;
-    } catch (error) {
-        console.error('Erreur lors de la récupération du classement :', error);
-        throw error;
-    }
-};
-
-export const getUserScores = async (userId) => {
-    try {
-        const response = await axiosInstance.get(`${BASE_URL}/scores/user/${userId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Erreur lors de la récupération des scores de l\'utilisateur :', error);
-        throw error;
-    }
-};
-
-export const getUserHighestScore = async (userId) => {
-    try {
-        const response = await axiosInstance.get(`${BASE_URL}/scores/user/${userId}/highest`);
-        return response.data;
-    } catch (error) {
-        console.error('Erreur lors de la récupération du meilleur score de l\'utilisateur :', error);
-        throw error;
-    }
-};
-
-export const postScore = async (score) => {
-    try {
-        const response = await axiosInstance.post(`${BASE_URL}/scores`, score);
-        return response.data;
-    } catch (error) {
-        console.error('Erreur lors de l\'enregistrement du score :', error);
-        throw error;
-    }
-};
-
 export const getIsAdmin = async () => {
     try {
         const response = await axiosInstance.get(`${BASE_URL}/auth/isadmin`);
@@ -218,6 +178,43 @@ export const getIsAdmin = async () => {
         throw error;
     }
 };
+export const getRestocks = async () => {
+    try {
+        const response = await axiosInstance.get('/restocks');
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des réapprovisionnements :', error);
+        throw error;
+    }
+};
 
+export const postRestock = async (restock) => {
+    try {
+        const response = await axiosInstance.post('/restocks', restock);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur serveur lors de la création du restock :', error);
+        throw error;
+    }
+};
 
+export const deleteRestock = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/restocks/${id}`);
+        return response.data; // ou response.status si vous n'attendez pas de payload
+    } catch (error) {
+        console.error('Erreur serveur lors de la suppression du restock :', error);
+        throw error;
+    }
+};
+
+export const deleteAllRestocks = async () => {
+    try {
+        const response = await axiosInstance.delete('/restocks');
+        return response.data;
+    } catch (error) {
+        console.error('Erreur serveur lors de la suppression de tous les restocks :', error);
+        throw error;
+    }
+};
 export default axiosInstance;

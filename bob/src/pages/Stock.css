@@ -16,7 +16,7 @@
 /* Grid layout for product cards within each group */
 .product-group .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 0.7 fr));
     gap: 1.5rem;
 }
 
@@ -24,18 +24,12 @@
 .product-card {
     background: white;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.3rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
 /* Specific styles for each product type group */
-
 /* Bière group */
 .product-group.biere {
     border-left: 6px solid #f39c12;
@@ -92,7 +86,76 @@
     color: #666;
 }
 
+/* Container for each product type group */
+.product-group {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
 
+/* Group header style */
+.product-group h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: #333;
+}
+
+/* Grid layout for product cards within each group */
+.product-group .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Filter buttons container */
+.filter-buttons {
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Filter button styles */
+.filter-buttons button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* Type-specific filter button styles */
+.filter-buttons button:nth-child(1) {
+    background-color: #fff8e1;
+    border: 1px solid #f39c12;
+}
+
+.filter-buttons button:nth-child(2) {
+    background-color: #f3e5f5;
+    border: 1px solid #8e44ad;
+}
+
+.filter-buttons button:nth-child(3) {
+    background-color: #e8f5e9;
+    border: 1px solid #27ae60;
+}
+
+.filter-buttons button:nth-child(4) {
+    background-color: #ffebee;
+    border: 1px solid #e74c3c;
+}
+
+/* "Show all" button style */
+.filter-buttons button:last-child {
+    background-color: #f5f5f5;
+    border: 1px solid #95a5a6;
+}
+
+/* Active state for filter buttons */
+.filter-buttons button.active {
+    border: 3px solid #824444;
+}
+
+.buttons-container {
+    margin-bottom: 100px;
+}
 
 .add-product-button {
     background-color: #3498db;
@@ -105,9 +168,17 @@
     z-index: 100;
 }
 
-.add-product-button:hover {
-    background-color: #2980b9;
+.restock-button {
+    background-color: rgb(39, 100, 174);
+    color: white;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
 }
+
 
 /* Modal styles */
 .modal-overlay {

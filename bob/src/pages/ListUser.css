@@ -1,9 +1,7 @@
 .profile-page {
-    max-width: 1200px;
     margin: 2rem auto;
-    margin-top: 100px;
+    margin-top: 60px;
     margin-bottom: 100px;
-    padding: 0 1rem;
 }
 
 .users-list {
@@ -19,10 +17,6 @@
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
-}
-
-.user-card:hover {
-    transform: translateY(-2px);
 }
 
 .user-card p {
@@ -45,10 +39,6 @@
     transition: color 0.2s;
 }
 
-.password-toggle-btn:hover {
-    color: #333;
-}
-
 .button-group {
     display: flex;
     gap: 1rem;
@@ -69,17 +59,9 @@
     color: white;
 }
 
-.btn-modif-users:hover {
-    background: #198183;
-}
-
 .delete-button {
     background: #DA3232;
     color: white;
-}
-
-.delete-button:hover {
-    background: #b12222;
 }
 
 .form-new-user {

@@ -8,11 +8,11 @@ import Ventes from './pages/Ventes';
 import Tresorerie from './pages/Tresorerie';
 import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile';
-import Page404 from './pages/Page404';
 import Login from './pages/LoginPage';
 import ListUser from './pages/ListUser';
 import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { isAuthenticated } from './services/auth';
+import Restock from './pages/Restocks';
 
 const App = () => {
   const [page, setPage] = useState('Home');
@@ -37,7 +37,7 @@ const App = () => {
           <Route path="/stock" element={<PageWrapper component={Stock} />} />
           <Route path="/statistiques" element={<PageWrapper component={Statistiques} />} />
 
-          {/* Routes protégées nécessitant les droits d'admin */}
+          {/* Routes protégées -> droits d'admin */}
           <Route
             path="/tresorerie"
             element={
@@ -54,10 +54,16 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-
-          {/* Page 404 pour les routes non trouvées */}
-          <Route path="*" element={<PageWrapper component={Page404} />} />
+          <Route
+            path="/restocks"
+            element={
+              <ProtectedRoute requireAdmin>
+                <PageWrapper component={Restock} />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+
       </>
     );
   };
