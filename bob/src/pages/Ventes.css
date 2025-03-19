@@ -30,25 +30,21 @@
 }
 
 .product-group .products-grid {
-    display: grid;
-    grid-template-columns: 0.8fr;
-    gap: 4%;
+    display: flex;
+    gap: 5%;
 }
 
 /* Product card with touch-friendly improvements */
 .product-card {
     background: white;
     border-radius: 10px;
-    padding: 3%;
+    padding: 4%;
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+    max-width: 40%
 }
 
-.product-card:active {
-    transform: translateY(1px);
-}
 
 /* Product group themes with improved contrast */
 .product-group.biere {
@@ -71,7 +67,6 @@
     background-color: #ffebee;
 }
 
-/* Modal improvements for mobile */
 .modalOverlayStyle {
     position: fixed;
     top: 0;
@@ -120,7 +115,7 @@
 }
 
 .filter-buttons button {
-    flex: 0 0 auto;
+    flex: 0 0 110px;
     width: 26%;
 }
 

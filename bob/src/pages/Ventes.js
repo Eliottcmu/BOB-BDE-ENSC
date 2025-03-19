@@ -148,9 +148,9 @@ const Ventes = ({ setPage }) => {
                                         onClick={() => addToCart(product)}
                                     >
                                         <img
-                                            src={`../../public/${product.name}.png`}
-                                            alt={product.name}
-                                            className="product-image"
+                                        // src={`../../public/${product.name}.png`}
+                                        // alt={product.name}
+                                        // className="product-image"
                                         />
 
                                         <h3>{product.name}</h3>

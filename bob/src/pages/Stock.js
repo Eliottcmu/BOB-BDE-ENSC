@@ -37,16 +37,13 @@ const Stock = ({ setPage }) => {
     const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
     const [restockForm, setRestockForm] = useState({
         productName: '',
-        quantity: '',        // Quantité à ajouter (entier positif)
-        costTotal: '',       // Coût total
-        date: ''             // Date du restock
+        quantity: '',
+        costTotal: '',
+        date: ''
     });
     // Liste des produits filtrés pour l'auto-complétion
     const [autoCompleteResults, setAutoCompleteResults] = useState([]);
 
-    /**
-     * Chargement initial
-     */
     useEffect(() => {
         setPage('Stock');
         loadProducts();
@@ -63,9 +60,7 @@ const Stock = ({ setPage }) => {
         }
     };
 
-    /**
-     * Formulaire d'ajout de produit
-     */
+
     const handleNewProductChange = (e) => {
         const { name, value } = e.target;
         setNewProduct((prev) => ({
@@ -271,7 +266,10 @@ const Stock = ({ setPage }) => {
                     ))}
                     <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
-
+                {/* Bouton pour ouvrir le modal de restock */}
+                <button className="restock-button" onClick={openRestockModal}>
+                    Modifier le stock
+                </button>
                 {productTypes.map((type) => {
                     if (selectedType && selectedType !== type) return null;
 
@@ -304,10 +302,6 @@ const Stock = ({ setPage }) => {
             </main>
 
             <div className="buttons-container">
-                {/* Bouton pour ouvrir le modal de restock */}
-                <button className="restock-button" onClick={openRestockModal}>
-                    Modifier le stock
-                </button>
                 {/* Bouton pour ouvrir le modal d'ajout de produit */}
                 <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
                     Ajouter un nouveau produit
@@ -332,19 +326,21 @@ const Stock = ({ setPage }) => {
                             />
                             {/* Liste déroulante de suggestions */}
                             {autoCompleteResults.length > 0 && (
-                                <ul className="autocomplete-list">
-                                    {autoCompleteResults.map((prod) => (
-                                        <li
-                                            key={prod.id}
-                                            onClick={() =>
-                                                handleSelectProductFromAutocomplete(prod)
-                                            }
-                                        >
-                                            {prod.name}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="autocomplete-container">
+                                    <ul className="autocomplete-list">
+                                        {autoCompleteResults.map((prod) => (
+                                            <li
+                                                key={prod.id}
+                                                onClick={() => handleSelectProductFromAutocomplete(prod)}
+                                                className="autocomplete-item"
+                                            >
+                                                {prod.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
+
 
                             <label>Quantité à ajouter :</label>
                             <input
