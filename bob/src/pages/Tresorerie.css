@@ -1,3 +1,4 @@
+/* Styles par défaut */
 #tresorerie-container {
     padding: 20px;
 }
@@ -29,8 +30,9 @@
 }
 
 .reset-button {
-    border-color: #DA3232;
+    border: 1px solid #DA3232;
     color: #DA3232;
+    background-color: transparent;
 }
 
 .summary-section {
@@ -48,4 +50,49 @@
     margin-top: 16px;
     text-align: center;
     margin-bottom: 50px;
+}
+
+/* Styles responsive pour téléphones */
+@media (max-width: 600px) {
+    #tresorerie-container {
+        padding: 10px;
+    }
+
+    .tresorerie-wrapper .title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .filter-section {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-left-width: 3px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .apply-button,
+    .reset-button {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .summary-section {
+        margin-top: 20px;
+        margin-bottom: 12px;
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .table-container {
+        font-size: 0.9rem;
+    }
+
+    .reset-section {
+        margin-top: 12px;
+        margin-bottom: 20px;
+    }
 }

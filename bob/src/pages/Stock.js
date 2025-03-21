@@ -60,7 +60,6 @@ const Stock = ({ setPage }) => {
         }
     };
 
-
     const handleNewProductChange = (e) => {
         const { name, value } = e.target;
         setNewProduct((prev) => ({
@@ -89,6 +88,12 @@ const Stock = ({ setPage }) => {
             return;
         }
 
+        // Vérifier que les prix et quantités ne sont pas négatifs
+        if (productToAdd.price < 0 || productToAdd.quantity < 0) {
+            setError('Les prix et quantités ne peuvent pas être négatifs');
+            return;
+        }
+
         try {
             const added = await postProduct(productToAdd);
             setProducts((prev) => [...prev, added]);
@@ -114,20 +119,14 @@ const Stock = ({ setPage }) => {
     };
 
     /**
-     * Formulaire de restock :
-     * - Champ de recherche par nom de produit (auto-complétion)
-     * - Quantité entière positive
-     * - Coût total
-     * - Date (par défaut : aujourd’hui)
+     * Ouvre le modal de restock et initialise le formulaire
      */
-
-    // Ouvrir le modal de restock
     const openRestockModal = () => {
         setRestockForm({
             productName: '',
             quantity: '',
             costTotal: '',
-            // Date du jour par défaut (format "YYYY-MM-DD" pour <input type="date" />)
+            // Date du jour par défaut (format "YYYY-MM-DD")
             date: new Date().toISOString().split('T')[0]
         });
         setAutoCompleteResults([]);
@@ -139,7 +138,6 @@ const Stock = ({ setPage }) => {
         setIsRestockModalOpen(false);
     };
 
-    // Gestion de la saisie dans les champs du restock
     const handleRestockInputChange = (e) => {
         const { name, value } = e.target;
         setRestockForm((prev) => ({
@@ -147,24 +145,33 @@ const Stock = ({ setPage }) => {
             [name]: value
         }));
 
-        // Auto-complétion (si on modifie le champ productName)
+        // Auto-complétion sur le nom du produit
         if (name === 'productName') {
             handleAutoComplete(value);
         }
     };
 
-    // Logique d'auto-complétion sur le nom du produit
+    // Logique d'auto-complétion améliorée sur le nom du produit
     const handleAutoComplete = (searchValue) => {
         if (!searchValue) {
             setAutoCompleteResults([]);
             return;
         }
-
-        // Filtrer parmi la liste de produits existants
+        const search = searchValue.toLowerCase();
+        // Filtrer les produits dont le nom contient la chaîne recherchée
         const results = products.filter((p) =>
-            p.name.toLowerCase().includes(searchValue.toLowerCase())
+            p.name.toLowerCase().includes(search)
         );
-        setAutoCompleteResults(results);
+        // Trier : en priorité ceux dont le nom commence par la chaîne recherchée
+        const sortedResults = results.sort((a, b) => {
+            const aStarts = a.name.toLowerCase().startsWith(search);
+            const bStarts = b.name.toLowerCase().startsWith(search);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+            // Sinon, trier alphabétiquement
+            return a.name.localeCompare(b.name);
+        });
+        setAutoCompleteResults(sortedResults);
     };
 
     // Lorsqu'on clique sur une suggestion dans la liste
@@ -216,25 +223,22 @@ const Stock = ({ setPage }) => {
         try {
             // Mise à jour du produit
             const updatedProduct = await putProduct(targetProduct.id, updatedProductData);
-
-            // Mettre à jour la liste locale
             setProducts((prev) =>
                 prev.map((p) => (p.id === targetProduct.id ? updatedProduct : p))
             );
 
             // Créer un document Restock
             const restockData = {
-                date: restockForm.date,          // format "YYYY-MM-DD"
+                date: restockForm.date,
                 idProduit: targetProduct.id,
                 quantiteAjoutee: addedQuantity,
                 coutTotal: cost,
-                fournisseur: 'Modification manuelle', // ou un champ à part si vous souhaitez
+                fournisseur: 'Modification manuelle',
                 note: `Ajout de ${addedQuantity} exemplaire(s) pour le produit ${targetProduct.name}`
             };
 
             await postRestock(restockData);
 
-            // Fermer le modal
             closeRestockModal();
             setError(null);
         } catch (err) {
@@ -282,10 +286,8 @@ const Stock = ({ setPage }) => {
                             <div className="products-grid">
                                 {filtered.map((product) => (
                                     <div key={product.id} className="product-card">
-                                        <h3>{product.name}</h3>
-                                        <p>Prix : {product.price.toFixed(2)} €</p>
-                                        <p>Quantité : {product.quantity}</p>
-                                        <div className="button-group">
+                                        <div className="product-header">
+                                            <h3>{product.name}</h3>
                                             <button
                                                 className="delete-button"
                                                 onClick={() => handleDeleteProduct(product.id)}
@@ -293,6 +295,8 @@ const Stock = ({ setPage }) => {
                                                 Supprimer
                                             </button>
                                         </div>
+                                        <p>{product.price.toFixed(2)} €</p>
+                                        <p>Stock : {product.quantity}</p>
                                     </div>
                                 ))}
                             </div>
@@ -306,15 +310,13 @@ const Stock = ({ setPage }) => {
                 <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
                     Ajouter un nouveau produit
                 </button>
-
             </div>
-            {/* Modal pour le restock (modification de la quantité) */}
+            {/* Modal pour le restock */}
             {isRestockModalOpen && (
                 <div className="modal-overlay active">
                     <div className="modal-content">
                         <h2>Modification du stock</h2>
                         <form onSubmit={handleSubmitRestock}>
-                            {/* Auto-complétion sur le nom du produit */}
                             <label>Produit :</label>
                             <input
                                 type="text"
@@ -324,7 +326,6 @@ const Stock = ({ setPage }) => {
                                 onChange={handleRestockInputChange}
                                 required
                             />
-                            {/* Liste déroulante de suggestions */}
                             {autoCompleteResults.length > 0 && (
                                 <div className="autocomplete-container">
                                     <ul className="autocomplete-list">
@@ -340,8 +341,6 @@ const Stock = ({ setPage }) => {
                                     </ul>
                                 </div>
                             )}
-
-
                             <label>Quantité à ajouter :</label>
                             <input
                                 type="number"
@@ -352,7 +351,6 @@ const Stock = ({ setPage }) => {
                                 min="1"
                                 required
                             />
-
                             <label>Coût total :</label>
                             <input
                                 type="number"
@@ -360,10 +358,10 @@ const Stock = ({ setPage }) => {
                                 placeholder="Prix total"
                                 value={restockForm.costTotal}
                                 onChange={handleRestockInputChange}
+                                min="0"
                                 step="0.01"
                                 required
                             />
-
                             <label>Date :</label>
                             <input
                                 type="date"
@@ -372,7 +370,6 @@ const Stock = ({ setPage }) => {
                                 onChange={handleRestockInputChange}
                                 required
                             />
-
                             <div className="button-group">
                                 <button type="submit">Valider</button>
                                 <button type="button" onClick={closeRestockModal}>
@@ -403,7 +400,8 @@ const Stock = ({ setPage }) => {
                                 placeholder="Prix du produit"
                                 value={newProduct.price}
                                 onChange={handleNewProductChange}
-                                step="0.01"
+                                min="0"
+                                step="0.1"
                                 required
                             />
                             <input
@@ -412,6 +410,7 @@ const Stock = ({ setPage }) => {
                                 placeholder="Quantité"
                                 value={newProduct.quantity}
                                 onChange={handleNewProductChange}
+                                min="0"
                                 required
                             />
                             <select
@@ -437,8 +436,6 @@ const Stock = ({ setPage }) => {
                     </div>
                 </div>
             )}
-
-
         </div>
     );
 };

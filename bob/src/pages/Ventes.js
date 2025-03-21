@@ -158,7 +158,7 @@ const Ventes = ({ setPage }) => {
                                         <p>Stock : {product.quantity}</p>
                                         {cart.find(item => item.id === product.id) && (
                                             <p>
-                                                Ajouté au panier : {cart.find(item => item.id === product.id).quantity}
+                                                Panier : {cart.find(item => item.id === product.id).quantity}
                                             </p>
                                         )}
                                     </div>

@@ -242,7 +242,7 @@ const ListUser = () => {
                                     </div>
                                     <div className="button-group">
                                         <button className='btn-modif-users' onClick={() => startEditing(user)}>Modifier</button>
-                                        <button onClick={() => handleDeleteUser(user.id)} className="delete-button">
+                                        <button onClick={() => handleDeleteUser(user.id)} className="delete-button-user">
                                             Supprimer
                                         </button>
                                     </div>

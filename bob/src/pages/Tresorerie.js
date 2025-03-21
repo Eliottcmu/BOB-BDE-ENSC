@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { getVentes, deleteVente, deleteAllVentes } from '../services/api';
 import {
-    Paper, Button, Box, Typography, useMediaQuery
+    Paper, Button, Box, Typography, useMediaQuery, Collapse, IconButton
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Loader from '../components/Loader/Loader';
-import './Tresorerie.css';
 import TresorerieFilters from '../components/TresorerieFilter/TresorerieFilter';
 import TresorerieTable from '../components/TresorerieTable/TresorerieTable';
 import ResetSalesDialog from '../components/ResetSalesDialog/ResetSalesDialog';
+import './Tresorerie.css';
 
 function formatDateTime(datetime) {
     if (!datetime || datetime === 'Invalid Date') return '';
@@ -35,6 +37,8 @@ const Tresorerie = ({ setPage }) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [venteToDelete, setVenteToDelete] = useState(null);
     const [resetDialogOpen, setResetDialogOpen] = useState(false);
+    // Par défaut, la section des filtres est fermée
+    const [showFilters, setShowFilters] = useState(false);
 
     const productList = useMemo(() =>
         [...new Set(ventes.map(vente => vente.name))].sort(), [ventes]
@@ -58,20 +62,12 @@ const Tresorerie = ({ setPage }) => {
         fetchVentes();
     }, []);
 
-    const groupOptions = [
-        { value: 'none', label: 'Pas de groupement' },
-        { value: 'day', label: 'Par jour' },
-        { value: 'month', label: 'Par mois' },
-        { value: 'year', label: 'Par année' }
-    ];
-
     const groupVentes = (ventes) => {
         if (groupBy === 'none') return [...ventes].sort((a, b) => new Date(b.date) - new Date(a.date));
 
         const grouped = ventes.reduce((acc, vente) => {
             const date = new Date(vente.date);
             let key;
-
             switch (groupBy) {
                 case 'day':
                     key = date.toISOString().split('T')[0];
@@ -85,7 +81,6 @@ const Tresorerie = ({ setPage }) => {
                 default:
                     key = vente.date;
             }
-
             if (!acc[key]) {
                 acc[key] = {
                     id: key,
@@ -105,7 +100,6 @@ const Tresorerie = ({ setPage }) => {
 
     const applyFilters = () => {
         let filtered = ventes;
-
         if (dateStart) {
             filtered = filtered.filter(vente => new Date(vente.date) >= dateStart);
         }
@@ -115,7 +109,6 @@ const Tresorerie = ({ setPage }) => {
         if (produitFilter) {
             filtered = filtered.filter(vente => vente.name === produitFilter);
         }
-
         setFilteredVentes(filtered);
         setTotal(filtered.reduce((sum, vente) => sum + vente.montant, 0));
         setDisplayCount(15);
@@ -189,27 +182,45 @@ const Tresorerie = ({ setPage }) => {
                 <h1>Trésorerie</h1>
             </header>
             <Box sx={{ padding: isMobile ? 2 : 4, width: '100%' }}>
-
                 <Box id="tresorerie-container" className="tresorerie-wrapper">
-                    <Paper className="summary-section">
-                        <Typography variant="h6">Total des ventes: {total.toFixed(2)} €</Typography>
+                    <Paper className="summary-section" sx={{ marginBottom: 2 }}>
+                        <Typography variant="h6">
+                            Total des ventes: {total.toFixed(2)} €
+                        </Typography>
                     </Paper>
 
-                    <TresorerieFilters
-                        dateStart={dateStart}
-                        setDateStart={setDateStart}
-                        dateEnd={dateEnd}
-                        setDateEnd={setDateEnd}
-                        produitFilter={produitFilter}
-                        setProduitFilter={setProduitFilter}
-                        groupBy={groupBy}
-                        setGroupBy={setGroupBy}
-                        productList={productList}
-                        onApplyFilters={applyFilters}
-                        onResetFilters={resetFilters}
-                    />
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                        <Typography variant="subtitle1">
+                            Filtres
+                        </Typography>
+                        <IconButton
+                            onClick={() => setShowFilters(!showFilters)}
+                            aria-label={showFilters ? "Masquer les filtres" : "Afficher les filtres"}
+                        >
+                            {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                    </Box>
 
-                    <Box className="reset-section">
+                    {/* Conteneur agrandi pour afficher les filtres */}
+                    <Collapse in={showFilters}>
+                        <Paper sx={{ padding: 3, marginBottom: 2 }}>
+                            <TresorerieFilters
+                                dateStart={dateStart}
+                                setDateStart={setDateStart}
+                                dateEnd={dateEnd}
+                                setDateEnd={setDateEnd}
+                                produitFilter={produitFilter}
+                                setProduitFilter={setProduitFilter}
+                                groupBy={groupBy}
+                                setGroupBy={setGroupBy}
+                                productList={productList}
+                                onApplyFilters={applyFilters}
+                                onResetFilters={resetFilters}
+                            />
+                        </Paper>
+                    </Collapse>
+
+                    <Box className="reset-section" sx={{ marginY: 2 }}>
                         <Button
                             variant="contained"
                             color="error"

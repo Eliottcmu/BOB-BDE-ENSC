@@ -64,8 +64,8 @@ const Restocks = ({ setPage }) => {
 
     return (
         <div className="restocks-container">
-            <header>
-                <h1>Historique des réapprovisionnements</h1>
+            <header className="header">
+                <h1>Historique Stock</h1>
             </header>
 
             <main>
@@ -86,7 +86,7 @@ const Restocks = ({ setPage }) => {
                     </button>
                 </div>
                 {restocks.length === 0 ? (
-                    <p className="no-restocks">Aucun réapprovisionnement enregistré.</p>
+                    <p className="no-restocks">Pas d'historique</p>
                 ) : (
                     <div className="table-container">
                         <table className="restocks-table">
@@ -94,10 +94,9 @@ const Restocks = ({ setPage }) => {
                                 <tr>
                                     <th>Date</th>
                                     <th>Produit</th>
-                                    <th>Quantité ajoutée</th>
-                                    <th>Coût total</th>
-                                    <th>Fournisseur</th>
-                                    <th>Note</th>
+                                    <th>Nombre</th>
+                                    <th>Prix total</th>
+                                    <th>Motif</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,7 +120,6 @@ const Restocks = ({ setPage }) => {
                                                 {restock.quantiteAjoutee}
                                             </td>
                                             <td data-label="Coût total">{restock.coutTotal} €</td>
-                                            <td data-label="Fournisseur">{restock.fournisseur}</td>
                                             <td data-label="Note">{restock.note || '-'}</td>
                                         </tr>
                                     );
