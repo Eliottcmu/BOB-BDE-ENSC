@@ -8,11 +8,11 @@ const Ventes = ({ setPage }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedType, setSelectedType] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [cart, setCart] = useState([]);
 
-    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
+    // Mise à jour des types de produit, incluant le nouveau type "Soft"
+    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam', 'Soft'];
 
     useEffect(() => {
         setPage('Ventes');
@@ -30,19 +30,8 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    // Opens the payment dialog for the chosen product
-    const openPaymentDialog = (product) => {
-        if (product.quantity <= 0) {
-            alert('Plus de stock disponible pour ce produit !');
-            return;
-        }
-        setSelectedProduct(product);
-        setIsDialogOpen(true);
-    };
-
     // Ajoute un produit au panier si le stock le permet
     const addToCart = (product) => {
-        // Vérifier le nombre déjà ajouté dans le panier pour ce produit
         const cartItem = cart.find(item => item.id === product.id);
         const quantityInCart = cartItem ? cartItem.quantity : 0;
         if (quantityInCart < product.quantity) {
@@ -70,12 +59,10 @@ const Ventes = ({ setPage }) => {
         setIsDialogOpen(true);
     };
 
-    // Gestion du paiement pour tous les produits du panier
+    // Traitement du paiement
     const handlePaymentSelection = async (paymentMethod) => {
         try {
-            // Traiter chaque produit du panier
             for (const item of cart) {
-                // Récupérer le produit dans la liste pour connaître le stock actuel
                 const productToUpdate = products.find(prod => prod.id === item.id);
                 if (productToUpdate) {
                     const newQuantity = productToUpdate.quantity - item.quantity;
@@ -96,7 +83,7 @@ const Ventes = ({ setPage }) => {
             setError('Erreur lors de la vente');
         } finally {
             setIsDialogOpen(false);
-            setCart([]); // Réinitialiser le panier après la vente
+            setCart([]);
         }
     };
 
@@ -111,7 +98,6 @@ const Ventes = ({ setPage }) => {
                     <span>Total du panier: {cartTotal.toFixed(2)}€</span>
                     <button onClick={handleCartValidation}>Valider le panier</button>
                 </div>
-                {/* Bouton pour vider le panier */}
                 {cart.length > 0 && (
                     <div className="clear-cart">
                         <button onClick={() => setCart([])}>Vider le panier</button>
@@ -132,44 +118,32 @@ const Ventes = ({ setPage }) => {
                     ))}
                     <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
-                {productTypes.map((type) => {
-                    if (selectedType && selectedType !== type) return null;
-                    const filteredProducts = products.filter((product) => product.type === type);
-                    if (filteredProducts.length === 0) return null;
-
-                    return (
-                        <div key={type} className={`product-group ${type.toLowerCase()}`}>
-                            <h2>{type}</h2>
-                            <div className="products-grid">
-                                {filteredProducts.map((product) => (
-                                    <div
-                                        key={product.id}
-                                        className="product-card"
-                                        onClick={() => addToCart(product)}
-                                    >
-                                        <img
-                                        // src={`../../public/${product.name}.png`}
-                                        // alt={product.name}
-                                        // className="product-image"
-                                        />
-
-                                        <h3>{product.name}</h3>
-                                        <h2>{product.price.toFixed(2)}€</h2>
-                                        <p>Stock : {product.quantity}</p>
-                                        {cart.find(item => item.id === product.id) && (
-                                            <p>
-                                                Panier : {cart.find(item => item.id === product.id).quantity}
-                                            </p>
-                                        )}
-                                    </div>
-                                ))}
+                <div className="products-grid">
+                    {products
+                        .filter(product => !selectedType || product.type === selectedType)
+                        .map(product => (
+                            <div
+                                key={product.id}
+                                className={`product-card ${product.type.toLowerCase()}`}
+                                onClick={() => addToCart(product)}
+                            >
+                                <img
+                                // src={`../../public/${product.name}.png`}
+                                // alt={product.name}
+                                // className="product-image"
+                                />
+                                <h3>{product.name}</h3>
+                                <h2>{product.price.toFixed(2)}€</h2>
+                                <p>Stock : {product.quantity}</p>
+                                {cart.find(item => item.id === product.id) && (
+                                    <p>Panier : {cart.find(item => item.id === product.id).quantity}</p>
+                                )}
                             </div>
-                        </div>
-                    );
-                })}
+                        ))
+                    }
+                </div>
             </main>
 
-            {/* Modal Dialog for Payment Method Selection */}
             {isDialogOpen && (
                 <div className="modalOverlayStyle">
                     <div className='modalStyle'>
@@ -179,16 +153,14 @@ const Ventes = ({ setPage }) => {
                         <button
                             onClick={() => {
                                 setIsDialogOpen(false);
-                                setSelectedProduct(null);
                             }}
                         >
                             Annuler
                         </button>
                     </div>
                 </div>
-            )
-            }
-        </div >
+            )}
+        </div>
     );
 };
 

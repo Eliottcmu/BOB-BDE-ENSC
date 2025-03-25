@@ -15,14 +15,12 @@ const Stock = ({ setPage }) => {
 
     // Liste de tous les produits
     const [products, setProducts] = useState([]);
-
-    // Gestion du chargement et des erreurs
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     // Filtrage par type
     const [selectedType, setSelectedType] = useState(null);
-    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam'];
+    const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam', 'Soft'];
 
     // Formulaire de création d'un nouveau produit
     const [newProduct, setNewProduct] = useState({
@@ -33,7 +31,7 @@ const Stock = ({ setPage }) => {
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Nouveau formulaire dédié au restock
+    // Formulaire et modal de restock
     const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
     const [restockForm, setRestockForm] = useState({
         productName: '',
@@ -41,7 +39,6 @@ const Stock = ({ setPage }) => {
         costTotal: '',
         date: ''
     });
-    // Liste des produits filtrés pour l'auto-complétion
     const [autoCompleteResults, setAutoCompleteResults] = useState([]);
 
     useEffect(() => {
@@ -62,7 +59,7 @@ const Stock = ({ setPage }) => {
 
     const handleNewProductChange = (e) => {
         const { name, value } = e.target;
-        setNewProduct((prev) => ({
+        setNewProduct(prev => ({
             ...prev,
             [name]: value
         }));
@@ -71,125 +68,115 @@ const Stock = ({ setPage }) => {
     const handleSubmitNewProduct = async (e) => {
         e.preventDefault();
 
+        if (!newProduct.name || newProduct.name.trim().length < 2) {
+            setError('Le nom du produit doit contenir au moins 2 caractères.');
+            return;
+        }
+
+        const priceNumber = parseFloat(newProduct.price);
+        if (isNaN(priceNumber) || priceNumber < 0.01 || priceNumber > 10000) {
+            setError('Le prix doit être un nombre entre 0.01 et 10000.');
+            return;
+        }
+
+        const quantityNumber = parseInt(newProduct.quantity, 10);
+        if (isNaN(quantityNumber) || quantityNumber < 0 || quantityNumber > 1000) {
+            setError('La quantité doit être un entier entre 0 et 1000.');
+            return;
+        }
+
+        if (!newProduct.type || !productTypes.includes(newProduct.type)) {
+            setError('Le type de produit est invalide.');
+            return;
+        }
+
         const productToAdd = {
             name: newProduct.name.trim(),
-            price: parseFloat(newProduct.price),
-            quantity: parseInt(newProduct.quantity, 10),
-            type: newProduct.type
+            price: priceNumber,
+            quantity: quantityNumber,
+            type: newProduct.type.trim()
         };
-
-        if (
-            !productToAdd.name ||
-            isNaN(productToAdd.price) ||
-            isNaN(productToAdd.quantity) ||
-            !productToAdd.type
-        ) {
-            setError('Veuillez remplir tous les champs correctement');
-            return;
-        }
-
-        // Vérifier que les prix et quantités ne sont pas négatifs
-        if (productToAdd.price < 0 || productToAdd.quantity < 0) {
-            setError('Les prix et quantités ne peuvent pas être négatifs');
-            return;
-        }
 
         try {
             const added = await postProduct(productToAdd);
-            setProducts((prev) => [...prev, added]);
+            setProducts(prev => [...prev, added]);
             setNewProduct({ name: '', price: '', quantity: '', type: '' });
             setIsModalOpen(false);
+            setError(null);
         } catch (err) {
             setError("Erreur lors de l'ajout du produit");
         }
     };
 
-    /**
-     * Suppression d'un produit
-     */
     const handleDeleteProduct = async (productId) => {
         if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
             try {
                 await deleteProduct(productId);
-                setProducts((prev) => prev.filter((p) => p.id !== productId));
+                setProducts(prev => prev.filter(p => p.id !== productId));
             } catch (err) {
                 setError('Erreur lors de la suppression du produit');
             }
         }
     };
 
-    /**
-     * Ouvre le modal de restock et initialise le formulaire
-     */
     const openRestockModal = () => {
         setRestockForm({
             productName: '',
             quantity: '',
             costTotal: '',
-            // Date du jour par défaut (format "YYYY-MM-DD")
             date: new Date().toISOString().split('T')[0]
         });
         setAutoCompleteResults([]);
         setIsRestockModalOpen(true);
     };
 
-    // Fermer le modal de restock
     const closeRestockModal = () => {
         setIsRestockModalOpen(false);
     };
 
     const handleRestockInputChange = (e) => {
         const { name, value } = e.target;
-        setRestockForm((prev) => ({
+        setRestockForm(prev => ({
             ...prev,
             [name]: value
         }));
-
-        // Auto-complétion sur le nom du produit
         if (name === 'productName') {
             handleAutoComplete(value);
         }
     };
 
-    // Logique d'auto-complétion améliorée sur le nom du produit
     const handleAutoComplete = (searchValue) => {
         if (!searchValue) {
             setAutoCompleteResults([]);
             return;
         }
         const search = searchValue.toLowerCase();
-        // Filtrer les produits dont le nom contient la chaîne recherchée
-        const results = products.filter((p) =>
+        const results = products.filter(p =>
             p.name.toLowerCase().includes(search)
         );
-        // Trier : en priorité ceux dont le nom commence par la chaîne recherchée
         const sortedResults = results.sort((a, b) => {
             const aStarts = a.name.toLowerCase().startsWith(search);
             const bStarts = b.name.toLowerCase().startsWith(search);
             if (aStarts && !bStarts) return -1;
             if (!aStarts && bStarts) return 1;
-            // Sinon, trier alphabétiquement
             return a.name.localeCompare(b.name);
         });
         setAutoCompleteResults(sortedResults);
     };
 
-    // Lorsqu'on clique sur une suggestion dans la liste
     const handleSelectProductFromAutocomplete = (product) => {
-        setRestockForm((prev) => ({
+        setRestockForm(prev => ({
             ...prev,
             productName: product.name
         }));
         setAutoCompleteResults([]);
     };
 
-    // Validation et envoi du restock
     const handleSubmitRestock = async (e) => {
         e.preventDefault();
 
-        // Trouver le produit correspondant au nom
         const targetProduct = products.find(
-            (p) => p.name.toLowerCase() === restockForm.productName.trim().toLowerCase()
+            p => p.name.toLowerCase() === restockForm.productName.trim().toLowerCase()
         );
 
         if (!targetProduct) {
@@ -197,37 +184,27 @@ const Stock = ({ setPage }) => {
             return;
         }
 
-        // Vérifier la quantité saisie
         const addedQuantity = parseInt(restockForm.quantity, 10);
-        if (isNaN(addedQuantity) || addedQuantity <= 0) {
-            setError("La quantité doit être un entier positif.");
+        if (isNaN(addedQuantity)) {
+            setError("La quantité doit être un entier.");
             return;
         }
 
-        // Vérifier le coût total
         const cost = parseFloat(restockForm.costTotal);
-        if (isNaN(cost) || cost < 0) {
-            setError("Le coût total doit être un nombre positif ou zéro.");
+        if (isNaN(cost)) {
+            setError("Le coût total doit être un nombre.");
             return;
         }
 
-        // Construire la nouvelle quantité
         const newQuantity = targetProduct.quantity + addedQuantity;
-
-        // Mettre à jour la partie "Produits" (PUT)
-        const updatedProductData = {
-            ...targetProduct,
-            quantity: newQuantity
-        };
+        const updatedProductData = { ...targetProduct, quantity: newQuantity };
 
         try {
-            // Mise à jour du produit
             const updatedProduct = await putProduct(targetProduct.id, updatedProductData);
-            setProducts((prev) =>
-                prev.map((p) => (p.id === targetProduct.id ? updatedProduct : p))
+            setProducts(prev =>
+                prev.map(p => (p.id === targetProduct.id ? updatedProduct : p))
             );
 
-            // Créer un document Restock
             const restockData = {
                 date: restockForm.date,
                 idProduit: targetProduct.id,
@@ -249,11 +226,14 @@ const Stock = ({ setPage }) => {
     if (loading) return <Loader message="Chargement des produits..." />;
     if (error) return <div className="error-message">{error}</div>;
 
+    const displayedProducts = selectedType
+        ? products.filter(p => p.type === selectedType)
+        : products;
+
     return (
-        <div className="ventes-container">
+        <div className="stock-container">
             <header className="header">
                 <h1>Stock</h1>
-                {/* Bouton pour accéder à l'historique */}
                 <button onClick={() => navigate('/restocks')}>Historique</button>
             </header>
 
@@ -270,48 +250,40 @@ const Stock = ({ setPage }) => {
                     ))}
                     <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
-                {/* Bouton pour ouvrir le modal de restock */}
-                <button className="restock-button" onClick={openRestockModal}>
-                    Modifier le stock
-                </button>
-                {productTypes.map((type) => {
-                    if (selectedType && selectedType !== type) return null;
-
-                    const filtered = products.filter((p) => p.type === type);
-                    if (filtered.length === 0) return null;
-
-                    return (
-                        <div key={type} className={`product-group ${type.toLowerCase()}`}>
-                            <h2>{type}</h2>
-                            <div className="products-grid">
-                                {filtered.map((product) => (
-                                    <div key={product.id} className="product-card">
-                                        <div className="product-header">
-                                            <h3>{product.name}</h3>
-                                            <button
-                                                className="delete-button"
-                                                onClick={() => handleDeleteProduct(product.id)}
-                                            >
-                                                Supprimer
-                                            </button>
-                                        </div>
-                                        <p>{product.price.toFixed(2)} €</p>
-                                        <p>Stock : {product.quantity}</p>
-                                    </div>
-                                ))}
+                <div className="actions">
+                    <button className="restock-button" onClick={openRestockModal}>
+                        Modifier le stock
+                    </button>
+                </div>
+                <div className="products-grid">
+                    {displayedProducts.map(product => (
+                        <div
+                            key={product.id}
+                            className={`product-card ${product.type.toLowerCase()}`}
+                        >
+                            <div className="product-header">
+                                <h3>{product.name}</h3>
+                                <button
+                                    className="delete-button"
+                                    onClick={() => handleDeleteProduct(product.id)}
+                                >
+                                    Supprimer
+                                </button>
                             </div>
+                            <p>{product.price.toFixed(2)} €</p>
+                            <p>Stock : {product.quantity}</p>
                         </div>
-                    );
-                })}
+                    ))}
+                </div>
+
             </main>
 
             <div className="buttons-container">
-                {/* Bouton pour ouvrir le modal d'ajout de produit */}
                 <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
                     Ajouter un nouveau produit
                 </button>
             </div>
-            {/* Modal pour le restock */}
+
             {isRestockModalOpen && (
                 <div className="modal-overlay active">
                     <div className="modal-content">
@@ -329,7 +301,7 @@ const Stock = ({ setPage }) => {
                             {autoCompleteResults.length > 0 && (
                                 <div className="autocomplete-container">
                                     <ul className="autocomplete-list">
-                                        {autoCompleteResults.map((prod) => (
+                                        {autoCompleteResults.map(prod => (
                                             <li
                                                 key={prod.id}
                                                 onClick={() => handleSelectProductFromAutocomplete(prod)}
@@ -348,7 +320,6 @@ const Stock = ({ setPage }) => {
                                 placeholder="Quantité"
                                 value={restockForm.quantity}
                                 onChange={handleRestockInputChange}
-                                min="1"
                                 required
                             />
                             <label>Coût total :</label>
@@ -358,7 +329,6 @@ const Stock = ({ setPage }) => {
                                 placeholder="Prix total"
                                 value={restockForm.costTotal}
                                 onChange={handleRestockInputChange}
-                                min="0"
                                 step="0.01"
                                 required
                             />
@@ -380,7 +350,7 @@ const Stock = ({ setPage }) => {
                     </div>
                 </div>
             )}
-            {/* Modal pour l'ajout d'un nouveau produit */}
+
             {isModalOpen && (
                 <div className="modal-overlay active">
                     <div className="modal-content">
@@ -420,7 +390,7 @@ const Stock = ({ setPage }) => {
                                 required
                             >
                                 <option value="">Sélectionnez un type</option>
-                                {productTypes.map((t) => (
+                                {productTypes.map(t => (
                                     <option key={t} value={t}>
                                         {t}
                                     </option>

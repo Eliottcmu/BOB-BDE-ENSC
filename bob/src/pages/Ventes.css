@@ -1,202 +1,216 @@
+/* Ventes.css */
+
+/* Définition des couleurs pastel pour chaque type de produit */
 :root {
-    --primary-blue: #2974c8;
-    --disabled-gray: #aaa;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --border-radius: 8px;
-    --spacing-sm: 0.75rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    --biere-color: #FCE4B3;
+    /* Pastel pour Biere */
+    --vin-color: #D1B2E5;
+    /* Pastel pour Vin */
+    --gouter-color: #C8E6C9;
+    /* Pastel pour Gouter */
+    --miam-color: #FFCDD2;
+    /* Pastel pour Miam */
+    --soft-color: #B2DFDB;
+    /* Pastel pour Soft */
 
-    --biere-color: #f39c12;
-    --vin-color: #8e44ad;
-    --gouter-color: #27ae60;
-    --miam-color: #e74c3c;
+    --background-color: #f5f5f5;
+    --text-color: #333;
+    --button-bg: #ffffff;
+    --button-text: #333;
+    --border-color: #ddd;
 }
 
-.product-group {
-    margin-bottom: 8%;
-    padding: 8%;
-    border-radius: 10px;
+/* Réinitialisation basique et styles globaux */
+body,
+html {
+    margin: 0;
+    margin-bottom: 50px;
+    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
-.product-group h2 {
-    margin-bottom: 8%;
-    font-size: 1.25rem;
-    text-transform: uppercase;
-    color: #333;
-    letter-spacing: 0.5px;
+/* Cartographie du résumé du panier */
+.cart-summary {
+    margin: 8px 0;
 }
 
-.product-group .products-grid {
+.cart-summary span {
+    font-size: 1rem;
+}
+
+.cart-summary button,
+.clear-cart button {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Boutons de filtre */
+.filter-buttons {
     display: flex;
-    gap: 5%;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
 }
 
-/* Product card with touch-friendly improvements */
+/* Bouton filtre générique (pour "Tout afficher" par exemple) */
+.filter-buttons button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Boutons de filtre spécifiques à chaque type */
+.filter-buttons button.biere {
+    background-color: var(--biere-color);
+    border-color: var(--biere-color);
+}
+
+.filter-buttons button.vin {
+    background-color: var(--vin-color);
+    border-color: var(--vin-color);
+}
+
+.filter-buttons button.gouter {
+    background-color: var(--gouter-color);
+    border-color: var(--gouter-color);
+}
+
+.filter-buttons button.miam {
+    background-color: var(--miam-color);
+    border-color: var(--miam-color);
+}
+
+.filter-buttons button.soft {
+    background-color: var(--soft-color);
+    border-color: var(--soft-color);
+}
+
+/* État actif des boutons de filtre */
+.filter-buttons button.active {
+    filter: brightness(0.9);
+    color: #fff;
+}
+
+/* Grille des produits */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+/* Carte produit */
 .product-card {
-    background: white;
-    border-radius: 10px;
-    padding: 4%;
-    box-shadow: var(--shadow-sm);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    touch-action: manipulation;
-    max-width: 40%
 }
 
-
-/* Product group themes with improved contrast */
-.product-group.biere {
-    border-left: 6px solid var(--biere-color);
-    background-color: #fff8e1;
+/* Fond de la carte selon le type de produit */
+.product-card.biere {
+    background-color: var(--biere-color);
 }
 
-.product-group.vin {
-    border-left: 6px solid var(--vin-color);
-    background-color: #f3e5f5;
+.product-card.vin {
+    background-color: var(--vin-color);
 }
 
-.product-group.gouter {
-    border-left: 6px solid var(--gouter-color);
-    background-color: #e8f5e9;
+.product-card.gouter {
+    background-color: var(--gouter-color);
 }
 
-.product-group.miam {
-    border-left: 6px solid var(--miam-color);
-    background-color: #ffebee;
+.product-card.miam {
+    background-color: var(--miam-color);
 }
 
+.product-card.soft {
+    background-color: var(--soft-color);
+}
+
+/* Styles des textes dans la carte */
+.product-card h3,
+.product-card h2,
+.product-card p {
+    margin: 6px 0;
+}
+
+/* Style pour le loader */
+.loader {
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Styles pour la modale de validation */
 .modalOverlayStyle {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;
     z-index: 1000;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    margin-bottom: 50px;
 }
 
 .modalStyle {
-    background-color: #ffffff;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
-    padding: var(--spacing-lg);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
     width: 90%;
-    max-width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    animation: modalSlideUp 0.3s ease-out;
-}
-
-/* Modal title improvements */
-.modalStyle h2 {
-    color: #0f0f0f;
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 var(--spacing-lg) 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-}
-
-.filter-buttons {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    gap: 2%;
-    padding-bottom: var(--spacing-sm);
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) transparent;
-}
-
-.filter-buttons button {
-    flex: 0 0 110px;
-    width: 26%;
-}
-
-
-/* Enhanced modal buttons */
-.modalStyle button {
-    background-color: #f0f0f0;
-    border: 1px solid #d1d1d1;
-    border-radius: 4px;
-    color: #0f0f0f;
-    cursor: pointer;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 1rem;
-    margin: var(--spacing-sm) 0;
-    width: 100%;
-    min-height: 44px;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    transition: all 0.2s ease;
-}
-
-/* Modal animations */
-@keyframes modalSlideUp {
-    from {
-        transform: translateY(100%);
-    }
-
-    to {
-        transform: translateY(0);
-    }
-}
-
-/* Responsive breakpoints */
-@media (min-width: 480px) {
-    .product-group .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .modalStyle {
-        border-radius: var(--border-radius);
-        margin: var(--spacing-lg);
-        align-self: center;
-        max-width: 480px;
-    }
-
-    .sell-button {
-        width: auto;
-    }
-}
-
-@media (min-width: 768px) {
-    .product-group .products-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .product-group h2 {
-        font-size: 1.5rem;
-    }
-}
-
-@media (min-width: 1024px) {
-    .product-group .products-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-/* Enhanced error message */
-.error-message {
+    max-width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
-    color: #dc3545;
-    background-color: #fff5f5;
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius);
-    margin: var(--spacing-xl) 0;
-    border: 1px solid #dc3545;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+.modalStyle h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.modalStyle button {
+    margin: 8px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Adaptation pour mobiles */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    .cart-summary span {
+        font-size: 1rem;
+    }
+
+    .filter-buttons button {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .product-card {
+        padding: 10px;
     }
 }
