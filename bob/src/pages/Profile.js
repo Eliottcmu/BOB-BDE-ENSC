@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUser, putUser } from '../services/api';
 import { Eye, EyeOff } from 'lucide-react';
+import './Profile.css';
 
 const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -25,10 +26,16 @@ const Profile = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                // Get user ID from local storage
-                const user = JSON.parse(localStorage.getItem('user'));
+                const storedUser = localStorage.getItem('user');
+                if (!storedUser) {
+                    // Si aucun utilisateur n'est stocké, on peut rediriger vers la page de connexion
+                    console.error('Aucun utilisateur authentifié trouvé.');
+                    setLoading(false);
+                    return;
+                }
+                const user = JSON.parse(storedUser);
 
-                // Fetch specific user's profile
+                // Fetch du profil de l'utilisateur
                 const currentUser = await getUser(user.id);
 
                 setUserProfile({
@@ -82,7 +89,7 @@ const Profile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate all fields
+        // Validation des champs
         const validationErrors = {};
         if (!validateEmail(userProfile.email)) validationErrors.email = "L'email doit être valide.";
         if (!validatePassword(userProfile.password)) validationErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
@@ -93,11 +100,16 @@ const Profile = () => {
         }
 
         try {
-            const user = JSON.parse(localStorage.getItem('user'));
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) {
+                console.error("Utilisateur non authentifié.");
+                return;
+            }
+            const user = JSON.parse(storedUser);
             const updatedUser = await putUser(user.id, userProfile);
 
-            // Update local storage
-            localStorage.setItem('user', JSON.stringify(updatedUser));
+            // Mise à jour du localStorage
+            localStorage.setItem('user', JSON.stringify({ id: updatedUser.id }));
 
             setEditMode(false);
         } catch (error) {
@@ -107,6 +119,11 @@ const Profile = () => {
 
     if (loading) {
         return <div>Chargement du profil...</div>;
+    }
+
+    // Vérifier que le profil a bien été chargé
+    if (!userProfile || !userProfile.email) {
+        return <div>Profil non disponible. Veuillez vous reconnecter.</div>;
     }
 
     return (

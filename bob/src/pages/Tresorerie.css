@@ -1,98 +1,112 @@
-/* Styles par défaut */
 #tresorerie-container {
+    padding: 24px;
+    background-color: #f7f9fc;
+}
+
+/* Conteneur global centré */
+.tresorerie-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Section récapitulative */
+.summary-section {
+    background-color: #e3f2fd;
+    border-radius: 8px;
     padding: 20px;
+    margin-bottom: 24px;
+    text-align: center;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.tresorerie-wrapper .title {
-    color: #105A5B;
-    font-weight: bold;
-}
-
+/* Section de filtres en mode card */
 .filter-section {
+    background-color: #fff;
+    border-radius: 8px;
     padding: 16px;
     margin-bottom: 16px;
-    border-left: 4px solid #E79B3B;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #1976d2;
 }
 
-.filter-select {
-    border-radius: 4px;
-}
-
+/* Boutons d'actions et filtres */
 .button-group {
-    margin-top: 16px;
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
 }
 
 .apply-button {
-    background-color: #105A5B;
-    color: white;
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .reset-button {
-    border: 1px solid #DA3232;
-    color: #DA3232;
     background-color: transparent;
+    color: #1976d2;
+    border: 2px solid #1976d2;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.summary-section {
-    background-color: #EFDAC0;
-    padding: 16px;
-    margin-bottom: 16px;
-    margin-top: 50px;
+.reset-button:hover {
+    background-color: #1976d2;
+    color: #fff;
 }
 
+/* Style du tableau */
 .table-container {
-    border: 1px solid #000000;
+    margin-top: 24px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+.MuiTableHead-root {
+    background-color: #f1f5f9;
+}
+
+.MuiTableCell-root {
+    padding: 16px;
+}
+
+.vente-row:hover {
+    background-color: #f9f9f9;
+}
+
+/* Section réinitialisation */
 .reset-section {
-    margin-top: 16px;
+    margin: 24px 0;
     text-align: center;
-    margin-bottom: 50px;
 }
 
-/* Styles responsive pour téléphones */
+/* Message d'erreur */
+.error-message {
+    color: #d32f2f;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+/* Adaptation mobile */
 @media (max-width: 600px) {
-    #tresorerie-container {
-        padding: 10px;
-    }
-
-    .tresorerie-wrapper .title {
-        font-size: 1.2rem;
-        text-align: center;
-    }
-
-    .filter-section {
-        padding: 12px;
-        margin-bottom: 12px;
-        border-left-width: 3px;
-    }
-
-    .button-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .apply-button,
-    .reset-button {
-        width: 100%;
-        font-size: 0.9rem;
-    }
 
     .summary-section {
-        margin-top: 20px;
-        margin-bottom: 12px;
-        padding: 12px;
-        font-size: 0.95rem;
-    }
-
-    .table-container {
+        padding: 16px;
         font-size: 0.9rem;
     }
 
-    .reset-section {
-        margin-top: 12px;
-        margin-bottom: 20px;
+    .MuiTableCell-root {
+        padding: 12px;
+        font-size: 0.8rem;
     }
 }

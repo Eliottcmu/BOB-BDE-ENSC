@@ -96,7 +96,6 @@ const Restocks = ({ setPage }) => {
                                     <th>Produit</th>
                                     <th>Nombre</th>
                                     <th>Prix total</th>
-                                    <th>Motif</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -120,7 +119,6 @@ const Restocks = ({ setPage }) => {
                                                 {restock.quantiteAjoutee}
                                             </td>
                                             <td data-label="Coût total">{restock.coutTotal} €</td>
-                                            <td data-label="Note">{restock.note || '-'}</td>
                                         </tr>
                                     );
                                 })}

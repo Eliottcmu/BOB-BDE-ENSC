@@ -5,7 +5,6 @@ const BASE_URL = 'http://localhost:5000/api';
 
 export const loginUser = async (credentials) => {
     try {
-        // Assurez-vous que ces champs correspondent à ceux attendus par le backend
         const response = await axios.post(`${BASE_URL}/auth/login`, {
             name: credentials.name,
             password: credentials.password
@@ -19,21 +18,17 @@ export const loginUser = async (credentials) => {
 
         // Stockage des informations d'authentification
         localStorage.setItem('token', token);
-        // localStorage.setItem('user', JSON.stringify({
-        //     id: user.id
-        // }));
+        // Décommenter pour stocker l'ID de l'utilisateur
+        localStorage.setItem('user', JSON.stringify({ id: user.id }));
 
         return user;
     } catch (error) {
         console.error('Login error:', error);
         if (error.response) {
-            // Erreur avec réponse du serveur
             throw new Error(error.response.data || 'Identifiants invalides');
         } else if (error.request) {
-            // Erreur sans réponse du serveur
             throw new Error('Le serveur ne répond pas. Veuillez réessayer plus tard.');
         } else {
-            // Autre type d'erreur
             throw new Error('Une erreur est survenue lors de la connexion');
         }
     }

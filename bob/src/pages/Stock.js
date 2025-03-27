@@ -6,17 +6,24 @@ import {
     deleteProduct,
     postRestock
 } from '../services/api';
+import { IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader/Loader';
 import './Stock.css';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteProductDialog from '../components/DeleteProductDialog/DeleteProductDialog';
 
 const Stock = ({ setPage }) => {
     const navigate = useNavigate();
 
-    // Liste de tous les produits
+    // État pour la liste des produits, le chargement et l'erreur
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // États pour la suppression d'un produit
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
 
     // Filtrage par type
     const [selectedType, setSelectedType] = useState(null);
@@ -51,15 +58,17 @@ const Stock = ({ setPage }) => {
             const data = await getProducts();
             setProducts(Array.isArray(data) ? data : []);
             setLoading(false);
+            setError(null);
         } catch (err) {
             setError('Erreur lors du chargement des produits');
             setLoading(false);
         }
     };
 
+    // Gestion du formulaire d'ajout de produit
     const handleNewProductChange = (e) => {
         const { name, value } = e.target;
-        setNewProduct(prev => ({
+        setNewProduct((prev) => ({
             ...prev,
             [name]: value
         }));
@@ -72,19 +81,16 @@ const Stock = ({ setPage }) => {
             setError('Le nom du produit doit contenir au moins 2 caractères.');
             return;
         }
-
         const priceNumber = parseFloat(newProduct.price);
         if (isNaN(priceNumber) || priceNumber < 0.01 || priceNumber > 10000) {
             setError('Le prix doit être un nombre entre 0.01 et 10000.');
             return;
         }
-
         const quantityNumber = parseInt(newProduct.quantity, 10);
         if (isNaN(quantityNumber) || quantityNumber < 0 || quantityNumber > 1000) {
             setError('La quantité doit être un entier entre 0 et 1000.');
             return;
         }
-
         if (!newProduct.type || !productTypes.includes(newProduct.type)) {
             setError('Le type de produit est invalide.');
             return;
@@ -99,7 +105,7 @@ const Stock = ({ setPage }) => {
 
         try {
             const added = await postProduct(productToAdd);
-            setProducts(prev => [...prev, added]);
+            setProducts((prev) => [...prev, added]);
             setNewProduct({ name: '', price: '', quantity: '', type: '' });
             setIsModalOpen(false);
             setError(null);
@@ -108,17 +114,28 @@ const Stock = ({ setPage }) => {
         }
     };
 
-    const handleDeleteProduct = async (productId) => {
-        if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-            try {
-                await deleteProduct(productId);
-                setProducts(prev => prev.filter(p => p.id !== productId));
-            } catch (err) {
-                setError('Erreur lors de la suppression du produit');
-            }
+    // Gestion de la suppression
+    const handleDeleteProduct = (product) => {
+        setProductToDelete(product);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDeleteProduct = async () => {
+        try {
+            await deleteProduct(productToDelete.id);
+            setProducts((prev) =>
+                prev.filter((p) => p.id !== productToDelete.id)
+            );
+            setError(null);
+        } catch (err) {
+            setError('Erreur lors de la suppression du produit');
+        } finally {
+            setDeleteDialogOpen(false);
+            setProductToDelete(null);
         }
     };
 
+    // Gestion du restock
     const openRestockModal = () => {
         setRestockForm({
             productName: '',
@@ -136,7 +153,7 @@ const Stock = ({ setPage }) => {
 
     const handleRestockInputChange = (e) => {
         const { name, value } = e.target;
-        setRestockForm(prev => ({
+        setRestockForm((prev) => ({
             ...prev,
             [name]: value
         }));
@@ -151,7 +168,7 @@ const Stock = ({ setPage }) => {
             return;
         }
         const search = searchValue.toLowerCase();
-        const results = products.filter(p =>
+        const results = products.filter((p) =>
             p.name.toLowerCase().includes(search)
         );
         const sortedResults = results.sort((a, b) => {
@@ -165,7 +182,7 @@ const Stock = ({ setPage }) => {
     };
 
     const handleSelectProductFromAutocomplete = (product) => {
-        setRestockForm(prev => ({
+        setRestockForm((prev) => ({
             ...prev,
             productName: product.name
         }));
@@ -176,7 +193,9 @@ const Stock = ({ setPage }) => {
         e.preventDefault();
 
         const targetProduct = products.find(
-            p => p.name.toLowerCase() === restockForm.productName.trim().toLowerCase()
+            (p) =>
+                p.name.toLowerCase() ===
+                restockForm.productName.trim().toLowerCase()
         );
 
         if (!targetProduct) {
@@ -201,8 +220,10 @@ const Stock = ({ setPage }) => {
 
         try {
             const updatedProduct = await putProduct(targetProduct.id, updatedProductData);
-            setProducts(prev =>
-                prev.map(p => (p.id === targetProduct.id ? updatedProduct : p))
+            setProducts((prev) =>
+                prev.map((p) =>
+                    p.id === targetProduct.id ? updatedProduct : p
+                )
             );
 
             const restockData = {
@@ -210,8 +231,7 @@ const Stock = ({ setPage }) => {
                 idProduit: targetProduct.id,
                 quantiteAjoutee: addedQuantity,
                 coutTotal: cost,
-                fournisseur: 'Modification manuelle',
-                note: `Ajout de ${addedQuantity} exemplaire(s) pour le produit ${targetProduct.name}`
+                fournisseur: 'Modification manuelle'
             };
 
             await postRestock(restockData);
@@ -224,11 +244,6 @@ const Stock = ({ setPage }) => {
     };
 
     if (loading) return <Loader message="Chargement des produits..." />;
-    if (error) return <div className="error-message">{error}</div>;
-
-    const displayedProducts = selectedType
-        ? products.filter(p => p.type === selectedType)
-        : products;
 
     return (
         <div className="stock-container">
@@ -236,6 +251,8 @@ const Stock = ({ setPage }) => {
                 <h1>Stock</h1>
                 <button onClick={() => navigate('/restocks')}>Historique</button>
             </header>
+
+            {error && <div className="error-message">{error}</div>}
 
             <main>
                 <div className="filter-buttons">
@@ -248,42 +265,60 @@ const Stock = ({ setPage }) => {
                             {type}
                         </button>
                     ))}
-                    <button onClick={() => setSelectedType(null)}>Tout afficher</button>
+                    <button onClick={() => setSelectedType(null)}>
+                        Tout afficher
+                    </button>
                 </div>
                 <div className="actions">
-                    <button className="restock-button" onClick={openRestockModal}>
+                    <button
+                        className="restock-button"
+                        onClick={openRestockModal}
+                    >
                         Modifier le stock
                     </button>
                 </div>
                 <div className="products-grid">
-                    {displayedProducts.map(product => (
+                    {(selectedType
+                        ? products.filter((p) => p.type === selectedType)
+                        : products
+                    ).map((product) => (
                         <div
                             key={product.id}
                             className={`product-card ${product.type.toLowerCase()}`}
                         >
                             <div className="product-header">
                                 <h3>{product.name}</h3>
-                                <button
+                                {/* <button
                                     className="delete-button"
-                                    onClick={() => handleDeleteProduct(product.id)}
+                                    onClick={() => handleDeleteProduct(product)}
                                 >
                                     Supprimer
-                                </button>
+                                </button> */}
+                                <IconButton
+                                    onClick={() => handleDeleteProduct(product)}
+                                    color="error"
+                                    size="small"
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
                             </div>
                             <p>{product.price.toFixed(2)} €</p>
                             <p>Stock : {product.quantity}</p>
                         </div>
                     ))}
                 </div>
-
             </main>
 
             <div className="buttons-container">
-                <button className="add-product-button" onClick={() => setIsModalOpen(true)}>
+                <button
+                    className="add-product-button"
+                    onClick={() => setIsModalOpen(true)}
+                >
                     Ajouter un nouveau produit
                 </button>
             </div>
 
+            {/* Modal de modification du stock */}
             {isRestockModalOpen && (
                 <div className="modal-overlay active">
                     <div className="modal-content">
@@ -301,10 +336,12 @@ const Stock = ({ setPage }) => {
                             {autoCompleteResults.length > 0 && (
                                 <div className="autocomplete-container">
                                     <ul className="autocomplete-list">
-                                        {autoCompleteResults.map(prod => (
+                                        {autoCompleteResults.map((prod) => (
                                             <li
                                                 key={prod.id}
-                                                onClick={() => handleSelectProductFromAutocomplete(prod)}
+                                                onClick={() =>
+                                                    handleSelectProductFromAutocomplete(prod)
+                                                }
                                                 className="autocomplete-item"
                                             >
                                                 {prod.name}
@@ -351,6 +388,7 @@ const Stock = ({ setPage }) => {
                 </div>
             )}
 
+            {/* Modal d'ajout de produit */}
             {isModalOpen && (
                 <div className="modal-overlay active">
                     <div className="modal-content">
@@ -390,7 +428,7 @@ const Stock = ({ setPage }) => {
                                 required
                             >
                                 <option value="">Sélectionnez un type</option>
-                                {productTypes.map(t => (
+                                {productTypes.map((t) => (
                                     <option key={t} value={t}>
                                         {t}
                                     </option>
@@ -405,6 +443,19 @@ const Stock = ({ setPage }) => {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {/* Dialogue de suppression */}
+            {deleteDialogOpen && (
+                <DeleteProductDialog
+                    open={deleteDialogOpen}
+                    onClose={() => {
+                        setDeleteDialogOpen(false);
+                        setProductToDelete(null);
+                    }}
+                    onConfirm={confirmDeleteProduct}
+                    productName={productToDelete ? productToDelete.name : ''}
+                />
             )}
         </div>
     );

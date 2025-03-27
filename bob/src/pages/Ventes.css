@@ -20,36 +20,6 @@
     --border-color: #ddd;
 }
 
-/* Réinitialisation basique et styles globaux */
-body,
-html {
-    margin: 0;
-    margin-bottom: 50px;
-    padding: 0;
-    font-family: Arial, sans-serif;
-}
-
-/* Cartographie du résumé du panier */
-.cart-summary {
-    margin: 8px 0;
-}
-
-.cart-summary span {
-    font-size: 1rem;
-}
-
-.cart-summary button,
-.clear-cart button {
-    padding: 8px 12px;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
 /* Boutons de filtre */
 .filter-buttons {
     display: flex;
@@ -108,6 +78,7 @@ html {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
+    margin-bottom: 220px
 }
 
 /* Carte produit */
@@ -146,12 +117,6 @@ html {
 .product-card h2,
 .product-card p {
     margin: 6px 0;
-}
-
-/* Style pour le loader */
-.loader {
-    text-align: center;
-    margin-top: 50px;
 }
 
 /* Styles pour la modale de validation */
@@ -197,9 +162,6 @@ html {
 
 /* Adaptation pour mobiles */
 @media (max-width: 480px) {
-    .header h1 {
-        font-size: 1.6rem;
-    }
 
     .cart-summary span {
         font-size: 1rem;
@@ -212,5 +174,180 @@ html {
 
     .product-card {
         padding: 10px;
+    }
+}
+
+.fixed-cart {
+    position: fixed;
+    bottom: 43px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    max-width: 600px;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    padding: 1rem;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Liste des items du panier */
+.cart-items {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-item-controls button {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--button-bg);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cart-item-controls button:hover {
+    background-color: #f0f0f0;
+}
+
+.cart-item-quantity {
+    min-width: 20px;
+    text-align: center;
+}
+
+.cart-item-total {
+    font-weight: bold;
+}
+
+/* Interface minimaliste et accessible pour le shopping cart */
+.cart {
+    border: 1px solid #ccc;
+    /* Couleur sobre pour la bordure */
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 1rem auto;
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Conteneur du résumé et bouton de validation */
+.cart-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Texte du résumé du panier */
+.cart-summary span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Bouton "Valider le panier" */
+.cart-summary button {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: #4a90e2;
+    color: #fff;
+    width: 100%;
+}
+
+.cart-summary button:hover {
+    background-color: #3a78c2;
+}
+
+.cart-summary button:active {
+    transform: scale(0.98);
+}
+
+.cart-summary button:focus {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+/* Bouton "Vider le panier" */
+.clear-cart {
+    text-align: center;
+}
+
+.clear-cart button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #e74c3c;
+    /* Rouge sobre */
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+}
+
+.clear-cart button:hover {
+    background-color: #c0392b;
+}
+
+.clear-cart button:active {
+    transform: scale(0.98);
+}
+
+.clear-cart button:focus {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+/* Ajustements pour écrans plus larges */
+@media (min-width: 600px) {
+    .cart {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cart-summary {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .cart-summary button,
+    .clear-cart button {
+        width: auto;
     }
 }

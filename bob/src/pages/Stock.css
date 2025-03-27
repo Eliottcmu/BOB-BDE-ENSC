@@ -1,0 +1,239 @@
+/* StockForm.css */
+
+/* Modal overlay for both forms (Ajouter un produit & Modifier le stock) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Modal content container */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease;
+}
+
+/* Animation for modal appearance */
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Form styles inside the modal */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Form header */
+.modal-content h2 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* Labels for form inputs */
+.modal-content label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Inputs and select fields styling */
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content input[type="date"],
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+}
+
+/* Placeholder styling */
+.modal-content input::placeholder {
+    color: #aaa;
+}
+
+/* Autocomplete container & list */
+.autocomplete-container {
+    position: relative;
+}
+
+.autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Button group for form actions */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* Button styling within the modal */
+.modal-content button {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Submit button style */
+.modal-content button[type="submit"] {
+    background-color: #394970;
+    color: #fff;
+}
+
+/* Cancel button style */
+.modal-content button[type="button"] {
+    background-color: #c17b5f;
+    color: #fff;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 16px;
+        width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .modal-content input,
+    .modal-content select {
+        font-size: 0.9rem;
+    }
+
+    .modal-content button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}
+
+/* Boutons "Ajouter un produit" et "Modifier le stock" */
+.add-product-button,
+.restock-button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 16px auto;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Bouton "Ajouter un produit" */
+.add-product-button {
+    background-color: #3954a4;
+    /* Vert */
+    color: #fff;
+}
+
+/* Bouton "Modifier le stock" */
+.restock-button {
+    background-color: #3b8564;
+    /* Bleu */
+    color: #fff;
+}
+
+/* Focus pour accessibilité */
+.add-product-button:focus,
+.restock-button:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+/* Effet au clic */
+.add-product-button:active,
+.restock-button:active {
+    transform: scale(0.98);
+}
+
+/* Ajustements pour mobile */
+@media (max-width: 480px) {
+
+    .add-product-button,
+    .restock-button {
+        width: 90%;
+        font-size: 1rem;
+        padding: 10px 16px;
+    }
+}
+
+/* Bouton Supprimer */
+.delete-button {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    background-color: #ae3f29;
+    /* Rouge */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.delete-button:focus {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+}
+
+.delete-button:active {
+    transform: scale(0.98);
+}

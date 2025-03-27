@@ -1,38 +1,97 @@
-body {
-    font-size: 0.8rem;
-}
-
+/* Conteneur principal */
 .restocks-container {
-    padding: 0;
+
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #f9f9f9;
 }
 
-/* Groupe de boutons à droite de l'en-tête */
+/* Groupe de boutons */
 .button-group {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 10px;
-    max-width: 60%;
-    font-size: 0.8rem;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
+.button-group button {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+/* Bouton Retour */
+.back-button {
+    background-color: #3b8564;
+    color: white;
+}
 
-/* Message d'absence de restocks */
-.no-restocks {
+/* Bouton Suppression */
+.delete-all-button {
+    background-color: #e53935;
+    color: white;
+}
+
+/* Tableau responsive */
+.table-container {
+    overflow-x: auto;
     margin-top: 1rem;
-    font-style: italic;
-    color: #666;
-    font-size: 1rem;
-    text-align: center;
 }
 
-/* Message d'erreur */
+.restocks-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+}
+
+.restocks-table th,
+.restocks-table td {
+    text-align: left;
+    padding: 0.75rem;
+}
+
+/* En-tête du tableau */
+.restocks-table thead {
+    background-color: #eeeeee;
+}
+
+/* Lignes du tableau avec effet "card" */
+.restocks-table tbody tr {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Messages d'erreur et absence de données */
 .error-message {
     margin-top: 1rem;
     color: #DA3232;
     font-weight: bold;
     text-align: center;
+}
+
+.no-restocks {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* Adaptation mobile */
+@media (max-width: 600px) {
+
+    .button-group button {
+        font-size: 0.85rem;
+    }
+
+    .restocks-table th,
+    .restocks-table td {
+        font-size: 0.85rem;
+    }
 }
