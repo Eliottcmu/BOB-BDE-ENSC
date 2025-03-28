@@ -1,5 +1,6 @@
 // services/auth.js
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const BASE_URL = 'http://localhost:5000/api';
 
@@ -16,10 +17,10 @@ export const loginUser = async (credentials) => {
             throw new Error('Réponse invalide du serveur');
         }
 
-        // Stockage des informations d'authentification
-        localStorage.setItem('token', token);
-        // Décommenter pour stocker l'ID de l'utilisateur
-        localStorage.setItem('user', JSON.stringify({ id: user.id }));
+        // Stockage du token et des informations utilisateur dans les cookies
+        Cookies.set('token', token, { expires: 7, sameSite: 'Lax' });
+
+        Cookies.set('user', JSON.stringify({ id: user.id, isAdmin: user.isAdmin }), { expires: 7 });
 
         return user;
     } catch (error) {
@@ -34,7 +35,6 @@ export const loginUser = async (credentials) => {
     }
 };
 
-// Création d'une instance axios avec intercepteur pour les tokens
 export const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: {
@@ -44,22 +44,20 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     config => {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
     },
-    error => {
-        return Promise.reject(error);
-    }
+    error => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
-    (response) => response,
+    response => response,
     async (error) => {
         if (error.response?.status === 401) {
-            // si token expiré ou invalide
+            // En cas d'erreur d'authentification, déconnecter et rediriger
             logout();
             window.location.href = '/login';
         }
@@ -68,18 +66,19 @@ axiosInstance.interceptors.response.use(
 );
 
 export const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.clear();
+    Cookies.remove('token');
+    Cookies.remove('user');
 };
 
 export const isAuthenticated = () => {
-    return !!localStorage.getItem('token');
+    return !!Cookies.get('token');
 };
 
 export const isAdmin = () => {
     try {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const userCookie = Cookies.get('user');
+        if (!userCookie) return false;
+        const user = JSON.parse(userCookie);
         return user?.isAdmin === true;
     } catch {
         return false;
@@ -88,7 +87,9 @@ export const isAdmin = () => {
 
 export const getCurrentUser = () => {
     try {
-        return JSON.parse(localStorage.getItem('user'));
+        const userCookie = Cookies.get('user');
+        if (!userCookie) return null;
+        return JSON.parse(userCookie);
     } catch {
         return null;
     }

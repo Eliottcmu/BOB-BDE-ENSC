@@ -1,43 +1,41 @@
+// components/Profile.js
 import React, { useState, useEffect } from 'react';
 import { getUser, putUser } from '../services/api';
+import { isAuthenticated, getCurrentUser } from '../services/auth';
 import { Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
-const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
-
-const validatePassword = (password) => {
-    return password.length > 3;
-};
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const validatePassword = (password) => password.length > 3;
 
 const Profile = () => {
-    const [userProfile, setUserProfile] = useState({
-        name: '',
-        email: '',
-        password: ''
-    });
+    const [userProfile, setUserProfile] = useState({ name: '', email: '', password: '' });
     const [editMode, setEditMode] = useState(false);
     const [visiblePassword, setVisiblePassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [touched, setTouched] = useState({});
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        // Vérifier si l'utilisateur est authentifié
+        if (!isAuthenticated()) {
+            // Redirection "manuelle" pour éviter les erreurs de sécurité liées à `replaceState`
+            window.location.href = '/login';
+            return null; // Important : retourner null après une redirection
+        }
+
+
         const fetchUserProfile = async () => {
             try {
-                const storedUser = localStorage.getItem('user');
+                const storedUser = getCurrentUser();
                 if (!storedUser) {
-                    // Si aucun utilisateur n'est stocké, on peut rediriger vers la page de connexion
                     console.error('Aucun utilisateur authentifié trouvé.');
-                    setLoading(false);
+                    navigate('/login');
                     return;
                 }
-                const user = JSON.parse(storedUser);
-
-                // Fetch du profil de l'utilisateur
-                const currentUser = await getUser(user.id);
-
+                const currentUser = await getUser(storedUser.id);
                 setUserProfile({
                     name: currentUser.name,
                     email: currentUser.email,
@@ -51,7 +49,7 @@ const Profile = () => {
         };
 
         fetchUserProfile();
-    }, []);
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -61,7 +59,6 @@ const Profile = () => {
 
     const validateField = (fieldName, value) => {
         const newErrors = { ...errors };
-
         if (fieldName === 'email') {
             if (!validateEmail(value)) {
                 newErrors.email = "L'email doit être valide.";
@@ -69,7 +66,6 @@ const Profile = () => {
                 delete newErrors.email;
             }
         }
-
         if (fieldName === 'password') {
             if (!validatePassword(value)) {
                 newErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
@@ -77,7 +73,6 @@ const Profile = () => {
                 delete newErrors.password;
             }
         }
-
         setErrors(newErrors);
     };
 
@@ -88,29 +83,22 @@ const Profile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validation des champs
         const validationErrors = {};
         if (!validateEmail(userProfile.email)) validationErrors.email = "L'email doit être valide.";
         if (!validatePassword(userProfile.password)) validationErrors.password = "Le mot de passe doit faire plus de 3 caractères.";
-
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
         }
-
         try {
-            const storedUser = localStorage.getItem('user');
+            const storedUser = getCurrentUser();
             if (!storedUser) {
                 console.error("Utilisateur non authentifié.");
+                navigate('/login');
                 return;
             }
-            const user = JSON.parse(storedUser);
-            const updatedUser = await putUser(user.id, userProfile);
-
-            // Mise à jour du localStorage
-            localStorage.setItem('user', JSON.stringify({ id: updatedUser.id }));
-
+            const updatedUser = await putUser(storedUser.id, userProfile);
+            localStorage.setItem('user', JSON.stringify({ id: updatedUser.id, isAdmin: updatedUser.isAdmin }));
             setEditMode(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour du profil :", error);
@@ -121,7 +109,6 @@ const Profile = () => {
         return <div>Chargement du profil...</div>;
     }
 
-    // Vérifier que le profil a bien été chargé
     if (!userProfile || !userProfile.email) {
         return <div>Profil non disponible. Veuillez vous reconnecter.</div>;
     }

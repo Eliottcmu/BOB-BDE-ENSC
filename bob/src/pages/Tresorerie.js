@@ -34,10 +34,7 @@ const Tresorerie = ({ setPage }) => {
     const [produitFilter, setProduitFilter] = useState('');
     const [groupBy, setGroupBy] = useState('none');
     const [displayCount, setDisplayCount] = useState(15);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [venteToDelete, setVenteToDelete] = useState(null);
     const [resetDialogOpen, setResetDialogOpen] = useState(false);
-    // Par défaut, la section des filtres est fermée
     const [showFilters, setShowFilters] = useState(false);
 
     const productList = useMemo(() =>
@@ -127,26 +124,6 @@ const Tresorerie = ({ setPage }) => {
         setDisplayCount(prevCount => prevCount + 15);
     };
 
-    const handleDeleteVente = async (venteId) => {
-        setVenteToDelete(venteId);
-        setDeleteDialogOpen(true);
-    };
-
-    const confirmDelete = async () => {
-        try {
-            await deleteVente(venteToDelete);
-            const updatedVentes = ventes.filter(vente => vente.id !== venteToDelete);
-            setVentes(updatedVentes);
-            setFilteredVentes(updatedVentes);
-            setTotal(updatedVentes.reduce((sum, vente) => sum + vente.montant, 0));
-        } catch (error) {
-            setError('Erreur lors de la suppression');
-        } finally {
-            setDeleteDialogOpen(false);
-            setVenteToDelete(null);
-        }
-    };
-
     const handleResetAllVentes = () => {
         setResetDialogOpen(true);
     };
@@ -200,8 +177,6 @@ const Tresorerie = ({ setPage }) => {
                             {showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                         </IconButton>
                     </Box>
-
-                    {/* Conteneur agrandi pour afficher les filtres */}
                     <Collapse in={showFilters}>
                         <Paper sx={{ padding: 3, marginBottom: 2 }}>
                             <TresorerieFilters

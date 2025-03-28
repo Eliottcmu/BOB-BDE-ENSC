@@ -4,7 +4,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import frLocale from 'date-fns/locale/fr';
 
-const TresorerieFilters = ({
+const TresorerieFiltersCompact = ({
     dateStart,
     setDateStart,
     dateEnd,
@@ -25,59 +25,63 @@ const TresorerieFilters = ({
     ];
 
     return (
-        <Paper className="filter-section">
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
+        <Paper style={{ padding: '8px', margin: '8px' }} elevation={2}>
+            <Grid container spacing={1}>
+                <Grid item xs={12} sm={6}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
                         <DatePicker
-                            label="Date début"
+                            label="Début"
                             value={dateStart}
                             onChange={setDateStart}
-                            renderInput={(params) => <TextField {...params} fullWidth />}
+                            renderInput={(params) => <TextField {...params} fullWidth size="small" />}
                         />
                     </LocalizationProvider>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={6}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={frLocale}>
                         <DatePicker
-                            label="Date fin"
+                            label="Fin"
                             value={dateEnd}
                             onChange={setDateEnd}
-                            renderInput={(params) => <TextField {...params} fullWidth />}
+                            renderInput={(params) => <TextField {...params} fullWidth size="small" />}
                         />
                     </LocalizationProvider>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={6}>
                     <Select
                         fullWidth
                         value={produitFilter}
                         onChange={(e) => setProduitFilter(e.target.value)}
-                        className="filter-select"
+                        size="small"
                     >
-                        <MenuItem value="">Tous les produits</MenuItem>
-                        {productList.map(product => (
-                            <MenuItem key={product} value={product}>{product}</MenuItem>
+                        <MenuItem value="">Tous</MenuItem>
+                        {productList.map((product) => (
+                            <MenuItem key={product} value={product}>
+                                {product}
+                            </MenuItem>
                         ))}
                     </Select>
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs={12} sm={6}>
                     <Select
                         fullWidth
                         value={groupBy}
                         onChange={(e) => setGroupBy(e.target.value)}
-                        className="filter-select"
+                        size="small"
                     >
-                        {groupOptions.map(opt => (
-                            <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                        {groupOptions.map((opt) => (
+                            <MenuItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </MenuItem>
                         ))}
                     </Select>
                 </Grid>
             </Grid>
-            <Box className="button-group">
-                <Button variant="contained" onClick={onApplyFilters} className="apply-button">
+            <Box display="flex" justifyContent="space-between" mt={1}>
+                <Button variant="contained" onClick={onApplyFilters} size="small">
                     Appliquer
                 </Button>
-                <Button variant="outlined" onClick={onResetFilters} className="reset-button">
+                <Button variant="outlined" onClick={onResetFilters} size="small">
                     Réinitialiser
                 </Button>
             </Box>
@@ -85,4 +89,4 @@ const TresorerieFilters = ({
     );
 };
 
-export default TresorerieFilters;
+export default TresorerieFiltersCompact;

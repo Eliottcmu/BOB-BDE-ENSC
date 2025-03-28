@@ -2,8 +2,20 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../services/auth';
+import {
+    Avatar,
+    Button,
+    CssBaseline,
+    TextField,
+    Paper,
+    Box,
+    Typography,
+    Container,
+    Alert
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-const Login = () => {
+const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [formData, setFormData] = useState({
@@ -25,64 +37,89 @@ const Login = () => {
 
         try {
             const user = await loginUser(formData);
-            // Rediriger vers la page demandée ou la page d'accueil
-            const from = location.state?.from?.pathname || '/';
-            navigate(from, { replace: true });
-        } catch (error) {
-            setError(error.message || 'Une erreur est survenue lors de la connexion');
-        }
+            const from = location?.state?.from?.pathname || '/';
+
+            // ⚠ navigate() provoque une erreur de sécurité dans certains contextes (iframe, etc.)
+            // => on utilise directement window.location.href comme fallback sécurisé
+            try {
+                // navigate provoque une erreur ? alors on passe à la suite
+                navigate(from, { replace: true });
+            } catch (error) {
+                console.warn('navigate() a échoué, utilisation du fallback :', error);
+                window.location.href = from;
+            }
+
+        } catch (err) {
+            setError('Nom ou mot de passe incorrect');
+        };
     };
-
     return (
-        <div >
-            <div>
-                <div>
-                    <h2>
-                        Connexion à votre compte
-                    </h2>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <div >
-                        <div>
-                            <label htmlFor="name" className="sr-only">Nom</label>
-                            <input
-                                id="name"
-                                name="name"
-                                type="name"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Nom"
-                                value={formData.name}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="sr-only">Mot de passe</label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Mot de passe"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            Se connecter
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Paper
+                elevation={3}
+                sx={{
+                    marginTop: 8,
+                    padding: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}
+            >
+                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} aria-label="icone de verrouillage">
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Connexion à votre compte
+                </Typography>
+                {error && (
+                    <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+                        {error}
+                    </Alert>
+                )}
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="name"
+                        label="Nom"
+                        name="name"
+                        autoComplete="name"
+                        autoFocus
+                        value={formData.name}
+                        onChange={handleChange}
+                        inputProps={{
+                            'aria-label': 'Entrez votre nom'
+                        }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Mot de passe"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        inputProps={{
+                            'aria-label': 'Entrez votre mot de passe'
+                        }}
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Se connecter
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
     );
 };
 
-export default Login;
+export default LoginPage;

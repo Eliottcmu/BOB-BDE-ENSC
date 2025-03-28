@@ -23,8 +23,11 @@ const App = () => {
 
   const AuthenticatedLayout = () => {
     if (!isAuthenticated()) {
-      return <Navigate to="/login" replace />;
+      // Redirection "manuelle" pour éviter les erreurs de sécurité liées à `replaceState`
+      window.location.href = '/login';
+      return null; // Important : retourner null après une redirection
     }
+
 
     return (
       <>
@@ -63,7 +66,6 @@ const App = () => {
             }
           />
         </Routes>
-
       </>
     );
   };
@@ -72,7 +74,8 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/login" element={<Login />} />
+        {/* Si l'utilisateur est déjà authentifié, il sera redirigé de /login vers /home */}
+        <Route path="/login" element={isAuthenticated() ? <Navigate to="/home" replace /> : <Login />} />
         <Route path="/*" element={<AuthenticatedLayout />} />
       </Routes>
     </BrowserRouter>

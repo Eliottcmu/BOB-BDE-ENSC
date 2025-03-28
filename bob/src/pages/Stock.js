@@ -15,21 +15,15 @@ import DeleteProductDialog from '../components/DeleteProductDialog/DeleteProduct
 
 const Stock = ({ setPage }) => {
     const navigate = useNavigate();
-
-    // État pour la liste des produits, le chargement et l'erreur
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // États pour la suppression d'un produit
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
 
-    // Filtrage par type
     const [selectedType, setSelectedType] = useState(null);
     const productTypes = ['Biere', 'Vin', 'Gouter', 'Miam', 'Soft'];
-
-    // Formulaire de création d'un nouveau produit
     const [newProduct, setNewProduct] = useState({
         name: '',
         price: '',
@@ -38,7 +32,6 @@ const Stock = ({ setPage }) => {
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Formulaire et modal de restock
     const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
     const [restockForm, setRestockForm] = useState({
         productName: '',
@@ -277,7 +270,14 @@ const Stock = ({ setPage }) => {
                         Modifier le stock
                     </button>
                 </div>
-                <div className="products-grid">
+                <div className="buttons-container">
+                    <button
+                        className="add-product-button"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        Ajouter un nouveau produit
+                    </button>
+                </div>                <div className="products-grid">
                     {(selectedType
                         ? products.filter((p) => p.type === selectedType)
                         : products
@@ -309,14 +309,7 @@ const Stock = ({ setPage }) => {
                 </div>
             </main>
 
-            <div className="buttons-container">
-                <button
-                    className="add-product-button"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    Ajouter un nouveau produit
-                </button>
-            </div>
+
 
             {/* Modal de modification du stock */}
             {isRestockModalOpen && (

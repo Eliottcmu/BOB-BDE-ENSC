@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
 import {
     getIsAdmin,
     getProducts,
     getVentes
 } from '../services/api';
+import { logout } from '../services/auth'; // Importation de la fonction logout
 
 function Home({ setPage }) {
     const navigate = useNavigate();
@@ -20,21 +20,21 @@ function Home({ setPage }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Check admin status
+                // Vérification du statut administrateur
                 const adminStatus = await getIsAdmin();
                 setIsAdmin(adminStatus);
 
-                // Get products for stock information
+                // Récupération des produits pour les infos de stock
                 const products = await getProducts();
                 const mostStocked = products.reduce((prev, current) =>
                     (prev.quantity > current.quantity) ? prev : current
                 );
                 setMostStockedProduct(mostStocked.name);
 
-                // Get sales data
+                // Récupération des données de ventes
                 const sales = await getVentes();
 
-                // Calculate most sold product overall
+                // Calcul du produit le plus vendu globalement
                 const productSales = {};
                 sales.forEach(sale => {
                     productSales[sale.name] = (productSales[sale.name] || 0) + sale.quantite;
@@ -46,7 +46,7 @@ function Home({ setPage }) {
                     );
                 setMostSoldProduct(topProduct.name);
 
-                // Calculate today's sales
+                // Calcul des ventes d'aujourd'hui
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
@@ -56,13 +56,13 @@ function Home({ setPage }) {
                     return saleDate.getTime() === today.getTime();
                 });
 
-                // Calculate today's revenue
+                // Calcul du chiffre d'affaires d'aujourd'hui
                 const revenue = todaySales.reduce((sum, sale) =>
                     sum + sale.montant, 0
                 );
-                setTodayRevenue(revenue || 0); // Use 0 if revenue is undefined or NaN
+                setTodayRevenue(revenue || 0);
 
-                // Calculate today's top product
+                // Calcul du produit le plus vendu d'aujourd'hui
                 const todayProductSales = {};
                 todaySales.forEach(sale => {
                     todayProductSales[sale.name] = (todayProductSales[sale.name] || 0) + sale.quantite;
@@ -83,8 +83,9 @@ function Home({ setPage }) {
     }, []);
 
     const handleLogout = () => {
+        // Appel à la fonction logout qui retire les cookies et nettoie la session
+        logout();
         navigate('/login');
-        localStorage.clear();
     };
 
     return (

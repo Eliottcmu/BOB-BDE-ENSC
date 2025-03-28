@@ -28,8 +28,11 @@ export const ProtectedRoute = ({ children, requireAdmin }) => {
     }, []);
 
     if (!isAuthenticated()) {
-        return <Navigate to="/login" replace />;
+        // Redirection "manuelle" pour éviter les erreurs de sécurité liées à `replaceState`
+        window.location.href = '/login';
+        return null; // Important : retourner null après une redirection
     }
+
 
     if (loading) {
         return <div>Chargement...</div>;
