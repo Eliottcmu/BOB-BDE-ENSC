@@ -8,10 +8,10 @@
 }
 
 #tresorerie-container,
+#home-container,
 #stock-container,
 #statistiques-container,
 #ventes-container,
 #accueil-container {
     padding-bottom: 56px;
-    /* Height of BottomNavigation */
 }

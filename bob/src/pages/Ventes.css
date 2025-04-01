@@ -1,17 +1,9 @@
-/* Ventes.css */
-
-/* Définition des couleurs pastel pour chaque type de produit */
 :root {
     --biere-color: #FCE4B3;
-    /* Pastel pour Biere */
     --vin-color: #D1B2E5;
-    /* Pastel pour Vin */
     --gouter-color: #C8E6C9;
-    /* Pastel pour Gouter */
     --miam-color: #FFCDD2;
-    /* Pastel pour Miam */
     --soft-color: #B2DFDB;
-    /* Pastel pour Soft */
 
     --background-color: #f5f5f5;
     --text-color: #333;
@@ -20,7 +12,6 @@
     --border-color: #ddd;
 }
 
-/* Boutons de filtre */
 .filter-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -29,7 +20,10 @@
     margin-bottom: 16px;
 }
 
-/* Bouton filtre générique (pour "Tout afficher" par exemple) */
+.filter-buttons.active {
+    outline: 1px solid #000;
+}
+
 .filter-buttons button {
     padding: 8px 12px;
     font-size: 0.9rem;
@@ -38,8 +32,12 @@
     background-color: var(--button-bg);
     color: var(--text-color);
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.filter-buttons button.active {
+    outline: 1px solid #333;
+}
+
 
 /* Boutons de filtre spécifiques à chaque type */
 .filter-buttons button.biere {
@@ -65,12 +63,6 @@
 .filter-buttons button.soft {
     background-color: var(--soft-color);
     border-color: var(--soft-color);
-}
-
-/* État actif des boutons de filtre */
-.filter-buttons button.active {
-    filter: brightness(0.9);
-    color: #fff;
 }
 
 /* Grille des produits */
@@ -119,13 +111,12 @@
     margin: 6px 0;
 }
 
-/* Styles pour la modale de validation */
 .modalOverlayStyle {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: 100dvh;
     background-color: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
@@ -135,10 +126,10 @@
 
 .modalStyle {
     background-color: #fff;
-    padding: 20px;
+    padding: 10px;
     border-radius: 8px;
     width: 90%;
-    max-width: 300px;
+    max-width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
 }
@@ -160,8 +151,9 @@
     transition: background-color 0.3s ease;
 }
 
+
 /* Adaptation pour mobiles */
-@media (max-width: 480px) {
+@media (max-width: 359px) {
 
     .cart-summary span {
         font-size: 1rem;
@@ -175,6 +167,23 @@
     .product-card {
         padding: 10px;
     }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-controls {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin-top: 0.5rem;
+    }
+
+    .cart-item-total {
+        align-self: flex-end;
+        font-size: 1.1rem;
+    }
+
 }
 
 .fixed-cart {
@@ -189,11 +198,12 @@
     padding: 1rem;
     box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
 }
 
 /* Liste des items du panier */
 .cart-items {
-    max-height: 200px;
+    max-height: calc(60dvh - 100px);
     overflow-y: auto;
     margin-bottom: 1rem;
 }
@@ -201,7 +211,7 @@
 .cart-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: 0.5rem 0;
     border-bottom: 1px solid #eee;
 }
@@ -336,7 +346,7 @@
 @media (min-width: 600px) {
     .cart {
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
     }
 

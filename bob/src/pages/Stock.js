@@ -253,15 +253,20 @@ const Stock = ({ setPage }) => {
                         <button
                             key={type}
                             onClick={() => setSelectedType(type)}
-                            className={selectedType === type ? 'active' : ''}
+                            className={`filter-button ${type} ${selectedType === type ? 'active' : ''
+                                }`}
                         >
                             {type}
                         </button>
                     ))}
-                    <button onClick={() => setSelectedType(null)}>
+                    <button
+                        onClick={() => setSelectedType(null)}
+                        className="filter-button"
+                    >
                         Tout afficher
                     </button>
                 </div>
+
                 <div className="actions">
                     <button
                         className="restock-button"

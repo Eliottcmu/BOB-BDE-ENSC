@@ -41,6 +41,33 @@ const Tresorerie = ({ setPage }) => {
         [...new Set(ventes.map(vente => vente.name))].sort(), [ventes]
     );
 
+    const exportToCSV = () => {
+        const headers = ['Date', 'Produit', 'Prix (€)', 'Type règlement'];
+        const rows = filteredVentes.map(vente => [
+            formatDateTime(vente.date),
+            vente.name,
+            vente.montant.toFixed(2).replace('.', ','), // Format français
+            vente.typeReglement || ''
+        ]);
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.join(','))
+            .join('\n');
+
+        const csvWithBom = '\uFEFF' + csvContent; // BOM UTF-8
+        const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'tresorerie.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
+
     React.useEffect(() => {
         const fetchVentes = async () => {
             try {
@@ -165,8 +192,17 @@ const Tresorerie = ({ setPage }) => {
                             Total des ventes: {total.toFixed(2)} €
                         </Typography>
                     </Paper>
+                    <Box className="export-section" sx={{ marginBottom: 2 }}>
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={exportToCSV}
+                        >
+                            Exporter en CSV
+                        </Button>
+                    </Box>
 
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Box display="flex" justifyContent="space-around" alignItems="center" mb={2}>
                         <Typography variant="subtitle1">
                             Filtres
                         </Typography>

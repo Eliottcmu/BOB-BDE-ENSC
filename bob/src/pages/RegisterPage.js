@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { loginUser } from '../services/auth';
+import { useNavigate } from 'react-router-dom';
 import {
     Avatar,
     Button,
@@ -10,16 +9,23 @@ import {
     Box,
     Typography,
     Container,
-    Alert, Link
+    Alert
 } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { registerUser } from '../services/api';
 
-const LoginPage = () => {
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
+
+const RegisterPage = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const [formData, setFormData] = useState({
         name: '',
-        password: ''
+        email: '',
+        password: '',
+        confirmPassword: ''
     });
     const [error, setError] = useState('');
 
@@ -34,24 +40,29 @@ const LoginPage = () => {
         e.preventDefault();
         setError('');
 
+        if (!isValidEmail(formData.email)) {
+            setError("L'adresse email n'est pas valide.");
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Les mots de passe ne correspondent pas.');
+            return;
+        }
+
         try {
-            const user = await loginUser(formData);
-            const from = location?.state?.from?.pathname || '/';
+            await registerUser({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password
+            });
 
-            // ⚠ navigate() provoque une erreur de sécurité dans certains contextes (iframe, etc.)
-            // => on utilise directement window.location.href comme fallback sécurisé
-            try {
-                // navigate provoque une erreur ? alors on passe à la suite
-                navigate(from, { replace: true });
-            } catch (error) {
-                console.warn('navigate() a échoué, utilisation du fallback :', error);
-                window.location.href = from;
-            }
-
+            navigate('/login');
         } catch (err) {
-            setError('Nom ou mot de passe incorrect');
-        };
+            setError("Une erreur est survenue lors de l'inscription.");
+        }
     };
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -65,11 +76,11 @@ const LoginPage = () => {
                     alignItems: 'center'
                 }}
             >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} aria-label="icone de verrouillage">
-                    <LockOutlinedIcon />
+                <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+                    <PersonAddIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Connexion à votre compte
+                    Créer un compte
                 </Typography>
                 {error && (
                     <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
@@ -88,9 +99,19 @@ const LoginPage = () => {
                         autoFocus
                         value={formData.name}
                         onChange={handleChange}
-                        inputProps={{
-                            'aria-label': 'Entrez votre nom'
-                        }}
+                        inputProps={{ 'aria-label': 'Entrez votre nom' }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Adresse email"
+                        name="email"
+                        autoComplete="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        inputProps={{ 'aria-label': 'Entrez votre adresse email' }}
                     />
                     <TextField
                         margin="normal"
@@ -100,12 +121,21 @@ const LoginPage = () => {
                         label="Mot de passe"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
                         value={formData.password}
                         onChange={handleChange}
-                        inputProps={{
-                            'aria-label': 'Entrez votre mot de passe'
-                        }}
+                        inputProps={{ 'aria-label': 'Entrez votre mot de passe' }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="confirmPassword"
+                        label="Confirmer le mot de passe"
+                        type="password"
+                        id="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        inputProps={{ 'aria-label': 'Confirmez votre mot de passe' }}
                     />
                     <Button
                         type="submit"
@@ -113,20 +143,12 @@ const LoginPage = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Se connecter
+                        S'inscrire
                     </Button>
                 </Box>
             </Paper>
-            <Typography
-                variant="body2"
-                sx={{ mt: 2, cursor: 'pointer', textDecoration: 'underline' }}
-                onClick={() => navigate('/register')}
-            >
-                Pas encore de compte ? S'inscrire
-            </Typography>
-
         </Container>
     );
 };
 
-export default LoginPage;
+export default RegisterPage;

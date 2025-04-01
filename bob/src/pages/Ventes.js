@@ -12,20 +12,15 @@ const Ventes = ({ setPage }) => {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const [cart, setCart] = useState([]);
 
-    // Pour la réduction globale (optionnel)
     const [discount, setDiscount] = useState({
         type: '',  // "", "pourcentage" ou "montant"
         value: 0
     });
+    const isAdmin = true; //remplacer par une vraie logique après -> à faire
 
-    // Simulez un flag d’admin (pour l’exemple)
-    const isAdmin = true;
-
-    // Liste des promotions (formules). Par défaut, on a la "Formule Gouter"
     const [promotions, setPromotions] = useState([
         {
             name: 'Formule Gouter',
-            // Vérifie si on peut former au moins 1 combo Gouter+Soft
             condition: (cartItems) => {
                 const gouterCount = cartItems.reduce((count, item) => {
                     return item.type === 'Gouter' ? count + item.quantity : count;
@@ -35,9 +30,7 @@ const Ventes = ({ setPage }) => {
                 }, 0);
                 return (gouterCount > 0 && softCount > 0);
             },
-            // Applique la promotion: 1 Gouter + 1 Soft => 2€ (au lieu de leurs prix cumulés).
             applyPromotion: (cartItems) => {
-                // On fait une copie pour le calcul
                 const updatedCart = JSON.parse(JSON.stringify(cartItems));
                 let gouterCount = 0;
                 let softCount = 0;
@@ -58,7 +51,6 @@ const Ventes = ({ setPage }) => {
         }
     ]);
 
-    // Permettre à un admin d’ajouter une nouvelle formule
     const [newFormula, setNewFormula] = useState({
         name: '',
         conditionText: '',
@@ -66,7 +58,6 @@ const Ventes = ({ setPage }) => {
     });
 
     const handleAddNewFormula = () => {
-        // Exemple simplifié
         const newPromotion = {
             name: newFormula.name,
             condition: (cartItems) => {
@@ -113,7 +104,6 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    // Ajoute un produit au panier (vérification du stock)
     const addToCart = (product) => {
         const cartItem = cart.find(item => item.id === product.id);
         const productFromList = products.find(prod => prod.id === product.id);
@@ -132,7 +122,6 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    // Augmente la quantité d'un article dans le panier
     const increaseCartItem = (item) => {
         const productFromList = products.find(prod => prod.id === item.id);
         if (item.quantity < productFromList.quantity) {
@@ -160,33 +149,18 @@ const Ventes = ({ setPage }) => {
         setCart(cart.filter(cartItem => cartItem.id !== item.id));
     };
 
-    /**
-     * Calcule le total du panier avec prise en compte des formules et de la réduction,
-     * et renvoie un objet détaillé :
-     *  {
-     *    totalFinal,
-     *    totalDiscount,
-     *    promotionsApplied: [ { name, discount, combosUsed }, ... ]
-     *  }
-     */
     const calculateCartTotalWithPromotions = () => {
-        // 1) Total brut
         let subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
-        // On suit le total des remises + la liste des promos appliquées
         let totalDiscount = 0;
         let promotionsApplied = [];
 
-        // 2) Appliquer les formules
         promotions.forEach((promo) => {
             if (promo.condition(cart)) {
                 const result = promo.applyPromotion(cart);
 
-                // Si c’est la formule Gouter
                 if (promo.name === 'Formule Gouter') {
                     const { updatedCart, totalCombos } = result;
                     if (totalCombos > 0) {
-                        // Tri + décrémentation seulement sur la copie (updatedCart)
                         const allGouter = updatedCart
                             .filter(it => it.type === 'Gouter')
                             .sort((a, b) => a.price - b.price);
@@ -213,8 +187,6 @@ const Ventes = ({ setPage }) => {
                             const normalPrice = cheapestGouter.price + cheapestSoft.price;
 
                             comboDiscount += (normalPrice - 2);
-
-                            // On décrémente dans la copie
                             cheapestGouter.quantity -= 1;
                             cheapestSoft.quantity -= 1;
 
@@ -222,8 +194,6 @@ const Ventes = ({ setPage }) => {
                         }
 
                         totalDiscount += comboDiscount;
-
-                        // On log la promo appliquée
                         promotionsApplied.push({
                             name: 'Formule Gouter',
                             combosUsed: totalCombos,
@@ -231,8 +201,6 @@ const Ventes = ({ setPage }) => {
                         });
                     }
                 }
-
-                // Sinon, c’est potentiellement une autre promo
                 else if (result.discount) {
                     totalDiscount += result.discount;
                     promotionsApplied.push({
@@ -245,7 +213,6 @@ const Ventes = ({ setPage }) => {
 
         let totalAfterPromotions = subtotal - totalDiscount;
 
-        // 3) Appliquer la réduction globale (optionnel)
         let globalDiscount = 0;
         if (discount.type === 'pourcentage' && discount.value > 0) {
             const before = totalAfterPromotions;
@@ -267,8 +234,6 @@ const Ventes = ({ setPage }) => {
         }
 
         totalDiscount += globalDiscount;
-
-        // On évite un total négatif
         totalAfterPromotions = Math.max(0, totalAfterPromotions);
 
         return {
@@ -290,7 +255,6 @@ const Ventes = ({ setPage }) => {
     // Gestion du paiement
     const handlePaymentSelection = async (paymentMethod) => {
         try {
-            // On récupère TOUTES les infos calculées
             const {
                 totalFinal,
                 totalDiscount,
@@ -305,11 +269,6 @@ const Ventes = ({ setPage }) => {
                 const newQuantity = productToUpdate.quantity - item.quantity;
                 await putProduct(item.id, { ...productToUpdate, quantity: newQuantity });
 
-                // Ex de ventilation simplifiée : on ne modifie pas le "montant" par article,
-                // mais on enregistre tout de même promotionsApplied pour savoir
-                // ce qui s'est passé sur la commande.
-                // Si vous voulez ventiler, calculez le ratio pour chaque item.
-
                 const vente = {
                     date: new Date(),
                     idProduit: item.id,
@@ -320,16 +279,11 @@ const Ventes = ({ setPage }) => {
                     name: item.name,
                     typeReglement: paymentMethod,
 
-                    // Ajout : on stocke la liste des promos appliquées globalement
                     promotionsUsed: promotionsApplied,
-                    // Ex : vous pourriez aussi stocker totalFinal et totalDiscount 
-                    // dans un enregistrement de commande global.                    
                 };
 
                 await postVentes(vente);
             }
-
-            // On pourrait aussi enregistrer un "résumé commande" (non présenté ici).
 
             loadProducts();
         } catch (err) {
@@ -340,7 +294,6 @@ const Ventes = ({ setPage }) => {
         }
     };
 
-    // Affichage
     if (loading) {
         return <Loader message="Chargement des produits..." />;
     }
@@ -348,7 +301,6 @@ const Ventes = ({ setPage }) => {
         return <div className="error-message">{error}</div>;
     }
 
-    // On calcule pour afficher en bas
     const { totalFinal } = calculateCartTotalWithPromotions();
 
     return (
@@ -362,15 +314,15 @@ const Ventes = ({ setPage }) => {
                         <button
                             key={type}
                             onClick={() => setSelectedType(type)}
-                            className={selectedType === type ? 'active' : type.toLowerCase()}
+                            className={`${type.toLowerCase()} ${selectedType === type ? 'active' : ''}`}
                         >
                             {type}
                         </button>
+
                     ))}
                     <button onClick={() => setSelectedType(null)}>Tout afficher</button>
                 </div>
 
-                {/* Exemple de réduction globale (facultatif) */}
                 <div className="discount-container">
                     <h3>Réduction Globale</h3>
                     <label>
@@ -394,7 +346,6 @@ const Ventes = ({ setPage }) => {
                     </label>
                 </div>
 
-                {/* Formulaire de création d’une nouvelle formule (réservé admin) */}
                 {isAdmin && (
                     <div className="new-formula-container">
                         <h3>Créer une nouvelle formule</h3>
@@ -420,7 +371,6 @@ const Ventes = ({ setPage }) => {
                     </div>
                 )}
 
-                {/* Affichage des produits */}
                 <div className="products-grid">
                     {products
                         .filter(product => !selectedType || product.type === selectedType)
@@ -443,11 +393,9 @@ const Ventes = ({ setPage }) => {
                 </div>
             </main>
 
-            {/* Panier fixe en bas (seulement s’il y a des articles) */}
             {cart.length > 0 && (
                 <div className="cart fixed-cart">
                     <div className="cart-summary">
-                        {/* On affiche totalFinal au lieu de cartTotal */}
                         <span>Total du panier: {totalFinal.toFixed(2)}€</span>
                         <button onClick={handleCartValidation}>Valider le panier</button>
                     </div>
@@ -462,7 +410,6 @@ const Ventes = ({ setPage }) => {
                 </div>
             )}
 
-            {/* Modal de modification du panier */}
             {isCartModalOpen && (
                 <div className="modalOverlayStyle">
                     <div className="modalStyle">
@@ -491,7 +438,6 @@ const Ventes = ({ setPage }) => {
                 </div>
             )}
 
-            {/* Modal de choix du mode de paiement */}
             {isDialogOpen && (
                 <div className="modalOverlayStyle">
                     <div className="modalStyle">

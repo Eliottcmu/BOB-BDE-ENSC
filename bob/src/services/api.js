@@ -217,4 +217,14 @@ export const deleteAllRestocks = async () => {
         throw error;
     }
 };
+export const registerUser = async (formData) => {
+    try {
+        const response = await axiosInstance.post(`${BASE_URL}/users/register`, formData);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de l’enregistrement de l’utilisateur :', error.response?.data || error.message);
+        throw error;
+    }
+};
+
 export default axiosInstance;

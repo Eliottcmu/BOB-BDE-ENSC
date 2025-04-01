@@ -11,13 +11,15 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import './NavBar.css';
 
-
 const NavBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const paths = ['/', '/stock', '/statistiques', '/tresorerie', '/ventes'];
-    const currentValue = paths.indexOf(location.pathname);
+    const paths = ['/home', '/stock', '/statistiques', '/tresorerie', '/ventes'];
+
+    const currentValue = paths.findIndex((path) =>
+        location.pathname === path || location.pathname.startsWith(path + '/')
+    );
 
     return (
         <Box sx={{ width: '100%' }}>

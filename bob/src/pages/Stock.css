@@ -1,6 +1,40 @@
-/* StockForm.css */
+:root {
+    --biere-color: #FCE4B3;
+    --vin-color: #D1B2E5;
+    --gouter-color: #C8E6C9;
+    --miam-color: #FFCDD2;
+    --soft-color: #B2DFDB;
+}
 
-/* Modal overlay for both forms (Ajouter un produit & Modifier le stock) */
+.filter-button.Biere {
+    background-color: var(--biere-color);
+    color: #333;
+}
+
+.filter-button.Vin {
+    background-color: var(--vin-color);
+    color: #333;
+}
+
+.filter-button.Gouter {
+    background-color: var(--gouter-color);
+    color: #333;
+}
+
+.filter-button.Miam {
+    background-color: var(--miam-color);
+    color: #333;
+}
+
+.filter-button.Soft {
+    background-color: var(--soft-color);
+    color: #333;
+}
+
+.filter-button.active {
+    outline: 1px solid #000;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -17,12 +51,6 @@
     transition: opacity 0.3s ease;
 }
 
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* Modal content container */
 .modal-content {
     background-color: #fff;
     padding: 20px;
@@ -33,7 +61,6 @@
     animation: slideDown 0.3s ease;
 }
 
-/* Animation for modal appearance */
 @keyframes slideDown {
     from {
         transform: translateY(-20px);
@@ -46,14 +73,12 @@
     }
 }
 
-/* Form styles inside the modal */
 .modal-content form {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-/* Form header */
 .modal-content h2 {
     margin-top: 0;
     text-align: center;
@@ -61,13 +86,11 @@
     color: #333;
 }
 
-/* Labels for form inputs */
 .modal-content label {
     font-weight: bold;
     color: #555;
 }
 
-/* Inputs and select fields styling */
 .modal-content input[type="text"],
 .modal-content input[type="number"],
 .modal-content input[type="date"],
@@ -80,12 +103,10 @@
     color: #333;
 }
 
-/* Placeholder styling */
 .modal-content input::placeholder {
     color: #aaa;
 }
 
-/* Autocomplete container & list */
 .autocomplete-container {
     position: relative;
 }
@@ -109,14 +130,12 @@
     transition: background-color 0.2s ease;
 }
 
-/* Button group for form actions */
 .button-group {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 12px;
 }
 
-/* Button styling within the modal */
 .modal-content button {
     flex: 1;
     padding: 10px;
@@ -127,19 +146,16 @@
     transition: background-color 0.3s ease;
 }
 
-/* Submit button style */
 .modal-content button[type="submit"] {
     background-color: #394970;
     color: #fff;
 }
 
-/* Cancel button style */
 .modal-content button[type="button"] {
     background-color: #c17b5f;
     color: #fff;
 }
 
-/* Responsive adjustments for mobile */
 @media (max-width: 480px) {
     .modal-content {
         padding: 16px;
@@ -161,7 +177,6 @@
     }
 }
 
-/* Boutons "Ajouter un produit" et "Modifier le stock" */
 .add-product-button,
 .restock-button {
     display: block;
@@ -177,34 +192,27 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Bouton "Ajouter un produit" */
 .add-product-button {
     background-color: #3954a4;
-    /* Vert */
     color: #fff;
 }
 
-/* Bouton "Modifier le stock" */
 .restock-button {
     background-color: #3b8564;
-    /* Bleu */
     color: #fff;
 }
 
-/* Focus pour accessibilité */
 .add-product-button:focus,
 .restock-button:focus {
     outline: 2px solid #000;
     outline-offset: 2px;
 }
 
-/* Effet au clic */
 .add-product-button:active,
 .restock-button:active {
     transform: scale(0.98);
 }
 
-/* Ajustements pour mobile */
 @media (max-width: 480px) {
 
     .add-product-button,
@@ -215,13 +223,11 @@
     }
 }
 
-/* Bouton Supprimer */
 .delete-button {
     display: inline-block;
     padding: 6px 10px;
     font-size: 0.9rem;
     background-color: #ae3f29;
-    /* Rouge */
     color: #fff;
     border: none;
     border-radius: 4px;

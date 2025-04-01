@@ -77,7 +77,7 @@ const TresorerieFiltersCompact = ({
                     </Select>
                 </Grid>
             </Grid>
-            <Box display="flex" justifyContent="space-between" mt={1}>
+            <Box display="flex" justifyContent="space-around" mt={1}>
                 <Button variant="contained" onClick={onApplyFilters} size="small">
                     Appliquer
                 </Button>

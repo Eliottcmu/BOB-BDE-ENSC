@@ -13,6 +13,7 @@ import ListUser from './pages/ListUser';
 import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { isAuthenticated } from './services/auth';
 import Restock from './pages/Restocks';
+import RegisterPage from './pages/RegisterPage';
 
 const App = () => {
   const [page, setPage] = useState('Home');
@@ -23,11 +24,9 @@ const App = () => {
 
   const AuthenticatedLayout = () => {
     if (!isAuthenticated()) {
-      // Redirection "manuelle" pour éviter les erreurs de sécurité liées à `replaceState`
       window.location.href = '/login';
-      return null; // Important : retourner null après une redirection
+      return null;
     }
-
 
     return (
       <>
@@ -39,8 +38,6 @@ const App = () => {
           <Route path="/profile" element={<PageWrapper component={Profile} />} />
           <Route path="/stock" element={<PageWrapper component={Stock} />} />
           <Route path="/statistiques" element={<PageWrapper component={Statistiques} />} />
-
-          {/* Routes protégées -> droits d'admin */}
           <Route
             path="/tresorerie"
             element={
@@ -73,9 +70,9 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        {/* Si l'utilisateur est déjà authentifié, il sera redirigé de /login vers /home */}
         <Route path="/login" element={isAuthenticated() ? <Navigate to="/home" replace /> : <Login />} />
+        <Route path="/register" element={isAuthenticated() ? <Navigate to="/home" replace /> : <RegisterPage />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/*" element={<AuthenticatedLayout />} />
       </Routes>
     </BrowserRouter>
